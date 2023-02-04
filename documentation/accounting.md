@@ -3,3 +3,5 @@
 27.1 - Worked on file reading and basic scanning - 2h
 
 28.1 - Worked on scanner, it now reads string literals to tokens - 2h
+
+4.2  - Worked some more on scanner and improved project layout - 2h
