@@ -2,8 +2,10 @@
 
 #include <fstream>
 
-void Scanner::scanSource() {
-  while (currentPosition_ <= sourceString_.length()) {
+void Scanner::scanSource()
+{
+  while (currentPosition_ <= sourceString_.length())
+  {
     tokenStart_ = currentPosition_;
     scanToken();
   }
@@ -11,24 +13,45 @@ void Scanner::scanSource() {
 
 const char Scanner::getNextChar() { return sourceString_[currentPosition_++]; }
 
-void Scanner::addToken(TokenType kind, const std::string &value) {
-  tokens.push_back({kind, value});
+void Scanner::addToken(TokenType kind, const std::string &value)
+{
+  tokens.push_back({kind, value, line_});
 }
 
-void Scanner::scanToken() {
+void Scanner::scanToken()
+{
   char character = getNextChar();
-  switch (character) {
+  switch (character)
+  {
   case '"':
     scanString();
     break;
-  case '+' | '-' | '*' | '/' | '<' | '=' | '&' |
-      '!': // FIXME: LOGICAL OR TURNS IT INTO SOME OTHER NUMBER!!!
-    addToken(TokenType::OPERATOR, &""[character]);
+  case '+':
+  case '-':
+  case '*':
+  case '/':
+  case '<':
+  case '=':
+  case '&':
+  case '!':
+    addToken(TokenType::OPERATOR, "operator FIXME");
     break;
   case ';':
+    line_++;
     addToken(TokenType::END_LINE, ";");
     break;
-  case 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56:
+  case '0':
+  case '1':
+  case '2':
+  case '3':
+  case '4':
+  case '5':
+  case '6':
+  case '7':
+  case '8':
+  case '9':
+    // NOTE: Need  to do some peeking here, for long integers and floats
+    scanNumber();
     break;
   case '\n':
     line_++;
@@ -38,11 +61,18 @@ void Scanner::scanToken() {
   }
 }
 
-void Scanner::scanString() {
+void Scanner::scanNumber() {
+  std::cout << "num literal!" << '\n';
+}
+
+void Scanner::scanString()
+{
   char nextChar = ' ';
-  while (nextChar != '"' && currentPosition_ <= sourceString_.length()) {
+  while (nextChar != '"' && currentPosition_ <= sourceString_.length())
+  {
     nextChar = getNextChar();
-    if (nextChar == '\\') {
+    if (nextChar == '\\')
+    {
       currentPosition_++;
     }
   }
@@ -51,21 +81,25 @@ void Scanner::scanString() {
            sourceString_.substr(tokenStart_, currentPosition_ - tokenStart_));
 }
 
-void Scanner::printChar(const char character) {
+void Scanner::printChar(const char character)
+{
   std::cout << character << '\r';
   std::cout.flush();
 }
 
 void Scanner::printSourceString() { std::cout << sourceString_ << '\n'; }
 
-void Scanner::readSourceFile(const std::string &fileName) {
+void Scanner::readSourceFile(const std::string &fileName)
+{
   std::ifstream file(fileName);
 
-  if (!file) {
+  if (!file)
+  {
     throw std::runtime_error("Failed to read file " + fileName);
   }
 
-  while (file) {
+  while (file)
+  {
     std::string inputStream;
     std::getline(file, inputStream);
     sourceString_ += inputStream;

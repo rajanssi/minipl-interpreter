@@ -7,6 +7,7 @@
 
 enum TokenType {
   STRING,
+  NUMBER,
   OPERATOR,
   END_LINE,
 };
@@ -18,12 +19,13 @@ enum CharType {
 };
 
 struct Token {
-  Token(TokenType kind, const std::string lexeme)
-      : kind{kind}, lexeme{lexeme} {}
+  Token(TokenType kind, const std::string lexeme, const int line)
+      : kind{kind}, lexeme{lexeme}, line{line} {}
   const std::string lexeme;
   const TokenType kind;
+  const int line;
 
-  void print() { std::cout << "{" << kind << ", " << lexeme << "}"; }
+  void print() { std::cout << "{" << kind << ", " << lexeme << ", " << line << "}"; }
 };
 
 class Scanner {
@@ -57,6 +59,7 @@ private:
 
   void scanToken();
   void scanString();
+  void scanNumber();
 
   void addToken(TokenType kind, const std::string& value);
 
