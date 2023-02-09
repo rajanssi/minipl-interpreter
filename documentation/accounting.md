@@ -7,3 +7,5 @@
 4.2  - Worked some more on scanner and improved project layout - 2h
 
 6.2  - Worked some more on scanner - 1h
+
+9.2  - Some more work on scanner, almost done with all potential characters! - 1h

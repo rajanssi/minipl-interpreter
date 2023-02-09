@@ -10,12 +10,18 @@ enum TokenType {
   NUMBER,
   OPERATOR,
   END_LINE,
+  LEFT_PAR,
+  RIGHT_PAR,
+
+  DOTDOT,
+  KEYWORD,
+  IDENTIFIER,
 };
 
 enum CharType {
   STRING_LITERAL,
   OPERATORs,
-  IDENTIFIER
+  IDENTIFIERs
 };
 
 struct Token {
@@ -59,11 +65,12 @@ private:
 
   void scanToken();
   void scanString();
-  void scanNumber();
+  void scanNumber(const char startingChar);
 
   void addToken(TokenType kind, const std::string& value);
 
   // constexpr int charType(const char character);
 
   const char getNextChar();
+  const char peek();
 };

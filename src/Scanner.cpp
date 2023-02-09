@@ -13,6 +13,11 @@ void Scanner::scanSource()
 
 const char Scanner::getNextChar() { return sourceString_[currentPosition_++]; }
 
+const char Scanner::peek() {
+  // TODO: Add some error checking code
+  return sourceString_[currentPosition + 1];
+}
+
 void Scanner::addToken(TokenType kind, const std::string &value)
 {
   tokens.push_back({kind, value, line_});
@@ -23,15 +28,25 @@ void Scanner::scanToken()
   char character = getNextChar();
   switch (character)
   {
+  case '(':
+    addToken(TokenType::LEFT_PAR, "(");
+    break;
+  case ')':
+    addToken(TokenType::RIGHT_PAR, ")");
+    break;
   case '"':
     scanString();
     break;
+  case '/': // Scan one ahead to see if comment or operator
+    break;
+  case '*': // Scan one ahead to see if comment or operator
+    break;
+  case ':': // Scan one ahead to see if assignment (:=) or type (var x : int)
+    break;
   case '+':
   case '-':
-  case '*':
-  case '/':
   case '<':
-  case '=':
+  case '=': // Equals, := is assignment
   case '&':
   case '!':
     addToken(TokenType::OPERATOR, "operator FIXME");
@@ -61,7 +76,7 @@ void Scanner::scanToken()
   }
 }
 
-void Scanner::scanNumber() {
+void Scanner::scanNumber(const char startingChar) {
   std::cout << "num literal!" << '\n';
 }
 
