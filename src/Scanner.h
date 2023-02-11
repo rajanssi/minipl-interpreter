@@ -14,8 +14,13 @@ enum TokenType {
   RIGHT_PAR,
 
   DOTDOT,
+  COLON,
+  ASSIGNMENT,
+  TYPE_DECLARATION,
   KEYWORD,
   IDENTIFIER,
+
+  UNKNOWN,
 };
 
 enum CharType {
@@ -64,8 +69,10 @@ private:
   void readSourceFile(const std::string &fileName);
 
   void scanToken();
+  void scanLineComment();
+  void scanComment();
   void scanString();
-  void scanNumber(const char startingChar);
+  void scanNumber();
 
   void addToken(TokenType kind, const std::string& value);
 

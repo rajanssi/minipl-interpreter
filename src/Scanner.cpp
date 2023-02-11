@@ -11,11 +11,19 @@ void Scanner::scanSource()
   }
 }
 
-const char Scanner::getNextChar() { return sourceString_[currentPosition_++]; }
+const char Scanner::getNextChar() {
+  // FIXME: PUT SOME SANE BOUNDS CHECKING HERE
+  if (currentPosition_  + 1 > sourceString_.length()) {
+      currentPosition_++;
+      return '?';
+  }
+  return sourceString_[currentPosition_++]; 
+}
 
-const char Scanner::peek() {
+const char Scanner::peek()
+{
   // TODO: Add some error checking code
-  return sourceString_[currentPosition + 1];
+  return sourceString_[currentPosition_];
 }
 
 void Scanner::addToken(TokenType kind, const std::string &value)
@@ -37,23 +45,57 @@ void Scanner::scanToken()
   case '"':
     scanString();
     break;
-  case '/': // Scan one ahead to see if comment or operator
+  case '/': // Look one ahead to see if comment or operator
+    if (peek() == '*')
+    {
+      scanComment();
+    }
+    else if (peek() == '/')
+    {
+      scanLineComment();
+    }
+    else
+    {
+      addToken(TokenType::OPERATOR, "/");
+    }
     break;
-  case '*': // Scan one ahead to see if comment or operator
+  case '*':
+      addToken(TokenType::OPERATOR, "*");
     break;
   case ':': // Scan one ahead to see if assignment (:=) or type (var x : int)
+    if (peek() == '=')
+    {
+      getNextChar();
+      // FIXME: SUBSTR IS INCORRECT HERE! AND POSSIBLY ELSEWHERE AS WELL!
+      addToken(TokenType::ASSIGNMENT, sourceString_.substr(currentPosition_-2, 2));
+    }
+    else
+    {
+      addToken(TokenType::TYPE_DECLARATION, ":");
+    }
     break;
   case '+':
+    addToken(TokenType::OPERATOR, "+");
+    break;
   case '-':
+    addToken(TokenType::OPERATOR, "-");
+    break;
   case '<':
-  case '=': // Equals, := is assignment
+    addToken(TokenType::OPERATOR, "<");
+    break;
+  case '=':
+    addToken(TokenType::OPERATOR, "=");
+    break;
   case '&':
+    addToken(TokenType::OPERATOR, "&");
+    break;
   case '!':
-    addToken(TokenType::OPERATOR, "operator FIXME");
+    // NOTE: Could probably make all operator cases fall through to this
+    addToken(TokenType::OPERATOR, sourceString_.substr(currentPosition_-1, 1));
     break;
   case ';':
-    line_++;
     addToken(TokenType::END_LINE, ";");
+    line_++;
     break;
   case '0':
   case '1':
@@ -68,16 +110,28 @@ void Scanner::scanToken()
     // NOTE: Need  to do some peeking here, for long integers and floats
     scanNumber();
     break;
+  case '\t':
+  case ' ':
+    break;
   case '\n':
     line_++;
     break;
   default:
+    //addToken(TokenType::UNKNOWN, sourceString_.substr(currentPosition_-1, 1));
     break;
   }
 }
 
-void Scanner::scanNumber(const char startingChar) {
-  std::cout << "num literal!" << '\n';
+void Scanner::scanLineComment()
+{
+}
+
+void Scanner::scanComment()
+{
+}
+
+void Scanner::scanNumber()
+{
 }
 
 void Scanner::scanString()

@@ -9,3 +9,5 @@
 6.2  - Worked some more on scanner - 1h
 
 9.2  - Some more work on scanner, almost done with all potential characters! - 1h
+
+10.2 - Some more work on scanner, all basic cases are perhaps done, need to work on number/identifier/comment scanning - 1h
