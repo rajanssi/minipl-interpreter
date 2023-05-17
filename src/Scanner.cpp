@@ -1,6 +1,8 @@
 #include "Scanner.h"
 
+#include <cstdlib>
 #include <fstream>
+#include <iterator>
 
 void Scanner::scanSource()
 {
@@ -17,7 +19,7 @@ const char Scanner::getNextChar() {
       currentPosition_++;
       return '?';
   }
-  return sourceString_[currentPosition_++]; 
+  return sourceString_[currentPosition_++];
 }
 
 const char Scanner::peek()
@@ -34,6 +36,16 @@ void Scanner::addToken(TokenType kind, const std::string &value)
 void Scanner::scanToken()
 {
   char character = getNextChar();
+  if (character == '_') {
+    // NOTE: nothing can start with underscore
+    // but make the error handling more sane
+    std::cout << "error on line " << line_ << '\n';
+    std::abort();
+  }
+  if (idChars_.find(character) != idChars_.end()) {
+    scanIdentifier(character);
+    return;
+  }
   switch (character)
   {
   case '(':
@@ -48,11 +60,15 @@ void Scanner::scanToken()
   case '/': // Look one ahead to see if comment or operator
     if (peek() == '*')
     {
+      // Scan until end of comment
+      getNextChar();
       scanComment();
     }
     else if (peek() == '/')
     {
-      scanLineComment();
+      //NOTE: line comment, can skip over the rest of the line
+      while (peek() != '\n') getNextChar();
+      break;
     }
     else
     {
@@ -67,7 +83,7 @@ void Scanner::scanToken()
     {
       getNextChar();
       // FIXME: SUBSTR IS INCORRECT HERE! AND POSSIBLY ELSEWHERE AS WELL!
-      addToken(TokenType::ASSIGNMENT, sourceString_.substr(currentPosition_-2, 2));
+      addToken(TokenType::ASSIGNMENT, ":=");
     }
     else
     {
@@ -90,13 +106,21 @@ void Scanner::scanToken()
     addToken(TokenType::OPERATOR, "&");
     break;
   case '!':
-    // NOTE: Could probably make all operator cases fall through to this
-    addToken(TokenType::OPERATOR, sourceString_.substr(currentPosition_-1, 1));
+    addToken(TokenType::OPERATOR, "!");
     break;
   case ';':
     addToken(TokenType::END_LINE, ";");
-    line_++;
+    //line_++;
     break;
+  case '.':
+    if (getNextChar() == '.') {
+      addToken(TokenType::DOTDOT, "..");
+      break;
+    } else {
+      // HACK: Make the error handling sane here too
+      std::cout << "Error on line " << line_ << '\n';
+      std::abort();
+    }
   case '0':
   case '1':
   case '2':
@@ -108,7 +132,7 @@ void Scanner::scanToken()
   case '8':
   case '9':
     // NOTE: Need  to do some peeking here, for long integers and floats
-    scanNumber();
+    scanNumber(character);
     break;
   case '\t':
   case ' ':
@@ -122,16 +146,43 @@ void Scanner::scanToken()
   }
 }
 
-void Scanner::scanLineComment()
+void Scanner::scanIdentifier(char starter)
 {
+  char nextChar = peek();
+  std::string identifier = "";
+  identifier += starter;
+  // NOTE: nextChar must be AZaz, _, or 0-9
+  while (idChars_.find(nextChar) != idChars_.end() || nextChar == '_' || (nextChar > 47 && nextChar < 58)) {
+    identifier += getNextChar();
+    nextChar = peek();
+  }
+  if (keywords_.find(identifier) != keywords_.end()) {
+    addToken(TokenType::KEYWORD, identifier);
+    return;
+  }
+  addToken(TokenType::IDENTIFIER, identifier);
 }
 
 void Scanner::scanComment()
 {
+  while (currentPosition_< sourceString_.length()) {
+    if (getNextChar() == '*' &&  peek() == '/') return;
+  }
 }
 
-void Scanner::scanNumber()
+void Scanner::scanNumber(char starter)
 {
+  std::string number = "";
+  number += starter;
+  char nextNum = peek();
+  while (nextNum != ' ') {
+    if (nextNum < 48 || nextNum > 57) break;
+
+    number += getNextChar();
+    nextNum = peek();
+  }
+
+  addToken(TokenType::NUMBER, number);
 }
 
 void Scanner::scanString()
@@ -147,13 +198,41 @@ void Scanner::scanString()
   }
 
   addToken(TokenType::STRING,
-           sourceString_.substr(tokenStart_, currentPosition_ - tokenStart_));
+         sourceString_.substr(tokenStart_, currentPosition_ - tokenStart_));
 }
 
 void Scanner::printChar(const char character)
 {
   std::cout << character << '\r';
   std::cout.flush();
+}
+
+const void Scanner::fillIdCharacterTable() {
+  for (char c = 'A'; c <= 'Z'; c++) {
+    idChars_.insert(c);
+  }
+  for (char c = 'a'; c <= 'z'; c++) {
+    idChars_.insert(c);
+  }
+}
+
+const void Scanner::fillKeywordTable() {
+  keywords_.insert("var");
+  keywords_.insert("for");
+  keywords_.insert("end");
+  keywords_.insert("in");
+  keywords_.insert("do");
+  keywords_.insert("read");
+
+  keywords_.insert("print");
+  keywords_.insert("int");
+  keywords_.insert("string");
+  keywords_.insert("bool");
+  keywords_.insert("assert");
+
+  keywords_.insert("if");
+  keywords_.insert("else");
+
 }
 
 void Scanner::printSourceString() { std::cout << sourceString_ << '\n'; }
@@ -172,5 +251,6 @@ void Scanner::readSourceFile(const std::string &fileName)
     std::string inputStream;
     std::getline(file, inputStream);
     sourceString_ += inputStream;
+    sourceString_ += '\n';
   }
 }

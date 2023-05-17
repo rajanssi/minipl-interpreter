@@ -1,9 +1,10 @@
 #pragma once
 
-#include <vector>
-#include <string>
 #include <iostream>
 #include <map>
+#include <set>
+#include <string>
+#include <vector>
 
 enum TokenType {
   STRING,
@@ -23,20 +24,17 @@ enum TokenType {
   UNKNOWN,
 };
 
-enum CharType {
-  STRING_LITERAL,
-  OPERATORs,
-  IDENTIFIERs
-};
 
 struct Token {
-  Token(TokenType kind, const std::string lexeme, const int line)
-      : kind{kind}, lexeme{lexeme}, line{line} {}
-  const std::string lexeme;
+  Token(TokenType kind, const std::string &terminal, const int line)
+      : kind{kind}, terminal{terminal}, line{line} {}
+  const std::string terminal;
   const TokenType kind;
   const int line;
 
-  void print() { std::cout << "{" << kind << ", " << lexeme << ", " << line << "}"; }
+  void print() {
+    std::cout << "{" << kind << ", " << terminal << ", " << line << "}";
+  }
 };
 
 class Scanner {
@@ -44,6 +42,8 @@ public:
   std::vector<Token> tokens;
 
   Scanner(const std::string &fileName) {
+    fillIdCharacterTable();
+    fillKeywordTable();
     try {
       readSourceFile(fileName);
     } catch (const std::runtime_error &error) {
@@ -60,7 +60,8 @@ public:
 
 private:
   std::string sourceString_;
-  std::map<char, TokenType> charTable_;
+  std::set<char> idChars_;
+  std::set<std::string> keywords_;
 
   int tokenStart_ = 0;
   int currentPosition_ = 0;
@@ -69,15 +70,19 @@ private:
   void readSourceFile(const std::string &fileName);
 
   void scanToken();
-  void scanLineComment();
+
   void scanComment();
   void scanString();
-  void scanNumber();
+  void scanNumber(char starter);
+  void scanIdentifier(char starter);
 
-  void addToken(TokenType kind, const std::string& value);
+  void addToken(TokenType kind, const std::string &value);
 
   // constexpr int charType(const char character);
 
   const char getNextChar();
   const char peek();
+
+  const void fillIdCharacterTable();
+  const void fillKeywordTable();
 };

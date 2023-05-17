@@ -26,10 +26,16 @@ int main(int argc, char *argv[]) {
 
   scanner->scanSource();
   // NOTE: Print tokens for show
+  int line = 1;
   for (auto t : scanner->tokens) {
-    t.print();
-    std::cout << '\n';
+    if (t.line != line) {
+      std::cout << '\n';
+      line++;
+    }
+    else std::cout << " ";
+    std::cout << t.terminal;
   }
+  std::cout << '\n';
 
   return 0;
 }
