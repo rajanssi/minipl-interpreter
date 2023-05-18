@@ -2,6 +2,10 @@ set(PROJECT_SOURCES
   main.cpp
   Scanner.h
   Scanner.cpp
+  Parser.cpp
+  Parser.h
+  ASTNodes.cpp
+  ASTNodes.h
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})

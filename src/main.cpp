@@ -1,12 +1,26 @@
 #include <memory>
 #include "Scanner.h"
+#include "Parser.h"
 
 inline void argumentError(int argc) {
   if (argc == 1) {
-    std::cout << "Please pass in the source file to interpret!\n";
+    std::cout << "Pass in the source file to interpret!\n";
   } else {
     std::cout << "Too many arguments, only pass in the source file to interpret!\n";
   }
+}
+
+inline void printTokens(std::vector<Token> &tokens) {
+  int line = 1;
+  for (auto t : tokens) {
+    if (t.line != line) {
+      std::cout << '\n';
+      line++;
+    }
+    else std::cout << " ";
+    t.print();
+  }
+  std::cout << '\n';
 }
 
 int main(int argc, char *argv[]) {
@@ -16,6 +30,7 @@ int main(int argc, char *argv[]) {
   }
 
   std::unique_ptr<Scanner> scanner;
+  std::unique_ptr<Parser> parser;
 
   try {
     scanner = std::make_unique<Scanner>(argv[1]);
@@ -24,18 +39,12 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  parser = std::make_unique<Parser>(*scanner);
+
   scanner->scanSource();
   // NOTE: Print tokens for show
-  int line = 1;
-  for (auto t : scanner->tokens) {
-    if (t.line != line) {
-      std::cout << '\n';
-      line++;
-    }
-    else std::cout << " ";
-    std::cout << t.terminal;
-  }
-  std::cout << '\n';
+  //printTokens(scanner->tokens);
+  parser->makeAST();
 
   return 0;
 }

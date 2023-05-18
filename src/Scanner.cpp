@@ -4,50 +4,42 @@
 #include <fstream>
 #include <iterator>
 
-void Scanner::scanSource()
-{
-  while (currentPosition_ <= sourceString_.length())
-  {
+void Scanner::scanSource() {
+  while (currentPosition_ <= sourceString_.length()) {
     tokenStart_ = currentPosition_;
     scanToken();
   }
 }
 
 const char Scanner::getNextChar() {
-  // FIXME: PUT SOME SANE BOUNDS CHECKING HERE
-  if (currentPosition_  + 1 > sourceString_.length()) {
-      currentPosition_++;
-      return '?';
+  // TODO: PUT SOME SANE BOUNDS CHECKING HERE
+  if (currentPosition_ + 1 > sourceString_.length()) {
+    currentPosition_++;
+    return '?';
   }
   return sourceString_[currentPosition_++];
 }
 
-const char Scanner::peek()
-{
+const char Scanner::peek() {
   // TODO: Add some error checking code
   return sourceString_[currentPosition_];
 }
 
-void Scanner::addToken(TokenType kind, const std::string &value)
-{
+void Scanner::addToken(TokenType kind, const std::string &value) {
   tokens.push_back({kind, value, line_});
 }
 
-void Scanner::scanToken()
-{
+void Scanner::scanToken() {
   char character = getNextChar();
   if (character == '_') {
-    // NOTE: nothing can start with underscore
-    // but make the error handling more sane
-    std::cout << "error on line " << line_ << '\n';
-    std::abort();
+    addToken(TokenType::UNKNOWN, "_");
+    return;
   }
   if (idChars_.find(character) != idChars_.end()) {
     scanIdentifier(character);
     return;
   }
-  switch (character)
-  {
+  switch (character) {
   case '(':
     addToken(TokenType::LEFT_PAR, "(");
     break;
@@ -58,35 +50,27 @@ void Scanner::scanToken()
     scanString();
     break;
   case '/': // Look one ahead to see if comment or operator
-    if (peek() == '*')
-    {
+    if (peek() == '*') {
       // Scan until end of comment
       getNextChar();
       scanComment();
-    }
-    else if (peek() == '/')
-    {
-      //NOTE: line comment, can skip over the rest of the line
-      while (peek() != '\n') getNextChar();
+    } else if (peek() == '/') {
+      // NOTE: line comment, can skip over the rest of the line
+      while (peek() != '\n')
+        getNextChar();
       break;
-    }
-    else
-    {
+    } else {
       addToken(TokenType::OPERATOR, "/");
     }
     break;
   case '*':
-      addToken(TokenType::OPERATOR, "*");
+    addToken(TokenType::OPERATOR, "*");
     break;
   case ':': // Scan one ahead to see if assignment (:=) or type (var x : int)
-    if (peek() == '=')
-    {
+    if (peek() == '=') {
       getNextChar();
-      // FIXME: SUBSTR IS INCORRECT HERE! AND POSSIBLY ELSEWHERE AS WELL!
       addToken(TokenType::ASSIGNMENT, ":=");
-    }
-    else
-    {
+    } else {
       addToken(TokenType::TYPE_DECLARATION, ":");
     }
     break;
@@ -110,16 +94,15 @@ void Scanner::scanToken()
     break;
   case ';':
     addToken(TokenType::END_LINE, ";");
-    //line_++;
+    // line_++;
     break;
   case '.':
-    if (getNextChar() == '.') {
+    if (peek() == '.') {
+      getNextChar();
       addToken(TokenType::DOTDOT, "..");
       break;
     } else {
-      // HACK: Make the error handling sane here too
-      std::cout << "Error on line " << line_ << '\n';
-      std::abort();
+      addToken(TokenType::UNKNOWN, ".");
     }
   case '0':
   case '1':
@@ -131,7 +114,6 @@ void Scanner::scanToken()
   case '7':
   case '8':
   case '9':
-    // NOTE: Need  to do some peeking here, for long integers and floats
     scanNumber(character);
     break;
   case '\t':
@@ -141,18 +123,18 @@ void Scanner::scanToken()
     line_++;
     break;
   default:
-    //addToken(TokenType::UNKNOWN, sourceString_.substr(currentPosition_-1, 1));
+    //addToken(TokenType::UNKNOWN, sourceString_.substr(currentPosition_ - 1, 1));
     break;
   }
 }
 
-void Scanner::scanIdentifier(char starter)
-{
+void Scanner::scanIdentifier(char starter) {
   char nextChar = peek();
   std::string identifier = "";
   identifier += starter;
   // NOTE: nextChar must be AZaz, _, or 0-9
-  while (idChars_.find(nextChar) != idChars_.end() || nextChar == '_' || (nextChar > 47 && nextChar < 58)) {
+  while (idChars_.find(nextChar) != idChars_.end() || nextChar == '_' ||
+         (nextChar > 47 && nextChar < 58)) {
     identifier += getNextChar();
     nextChar = peek();
   }
@@ -160,24 +142,25 @@ void Scanner::scanIdentifier(char starter)
     addToken(TokenType::KEYWORD, identifier);
     return;
   }
+  if (identifier == "true" || identifier == "false") {
+    addToken(TokenType::BOOLEAN, identifier);
+    return;
+  }
   addToken(TokenType::IDENTIFIER, identifier);
 }
 
-void Scanner::scanComment()
-{
-  while (currentPosition_< sourceString_.length()) {
-    if (getNextChar() == '*' &&  peek() == '/') return;
+void Scanner::scanComment() {
+  while (currentPosition_ < sourceString_.length()) {
+    if (getNextChar() == '*' && peek() == '/')
+      return;
   }
 }
 
-void Scanner::scanNumber(char starter)
-{
+void Scanner::scanNumber(char starter) {
   std::string number = "";
   number += starter;
   char nextNum = peek();
-  while (nextNum != ' ') {
-    if (nextNum < 48 || nextNum > 57) break;
-
+  while (nextNum > 47 && nextNum < 58) {
     number += getNextChar();
     nextNum = peek();
   }
@@ -185,24 +168,20 @@ void Scanner::scanNumber(char starter)
   addToken(TokenType::NUMBER, number);
 }
 
-void Scanner::scanString()
-{
+void Scanner::scanString() {
   char nextChar = ' ';
-  while (nextChar != '"' && currentPosition_ <= sourceString_.length())
-  {
+  while (nextChar != '"' && currentPosition_ <= sourceString_.length()) {
     nextChar = getNextChar();
-    if (nextChar == '\\')
-    {
+    if (nextChar == '\\') {
       currentPosition_++;
     }
   }
 
   addToken(TokenType::STRING,
-         sourceString_.substr(tokenStart_, currentPosition_ - tokenStart_));
+           sourceString_.substr(tokenStart_, currentPosition_ - tokenStart_));
 }
 
-void Scanner::printChar(const char character)
-{
+void Scanner::printChar(const char character) {
   std::cout << character << '\r';
   std::cout.flush();
 }
@@ -232,22 +211,18 @@ const void Scanner::fillKeywordTable() {
 
   keywords_.insert("if");
   keywords_.insert("else");
-
 }
 
 void Scanner::printSourceString() { std::cout << sourceString_ << '\n'; }
 
-void Scanner::readSourceFile(const std::string &fileName)
-{
+void Scanner::readSourceFile(const std::string &fileName) {
   std::ifstream file(fileName);
 
-  if (!file)
-  {
+  if (!file) {
     throw std::runtime_error("Failed to read file " + fileName);
   }
 
-  while (file)
-  {
+  while (file) {
     std::string inputStream;
     std::getline(file, inputStream);
     sourceString_ += inputStream;

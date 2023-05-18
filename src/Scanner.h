@@ -9,6 +9,7 @@
 enum TokenType {
   STRING,
   NUMBER,
+  BOOLEAN,
   OPERATOR,
   END_LINE,
   LEFT_PAR,
@@ -22,6 +23,7 @@ enum TokenType {
   IDENTIFIER,
 
   UNKNOWN,
+  END_OF_FILE,
 };
 
 

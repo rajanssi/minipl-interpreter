@@ -13,3 +13,5 @@
 10.5 - Some more work on scanner, all basic cases are perhaps done, need to work on number/identifier/comment scanning - 1h
 
 17.5 - Scanner should be pretty much done, with maybe some edge cases remaining - 2h
+
+18.5 - Started working on parser - 2h
