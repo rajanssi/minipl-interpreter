@@ -15,3 +15,5 @@
 17.5 - Scanner should be pretty much done, with maybe some edge cases remaining - 2h
 
 18.5 - Started working on parser - 2h
+
+19.5 - Workder on parsing - 4h

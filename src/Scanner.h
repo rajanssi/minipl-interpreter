@@ -16,7 +16,6 @@ enum TokenType {
   RIGHT_PAR,
 
   DOTDOT,
-  COLON,
   ASSIGNMENT,
   TYPE_DECLARATION,
   KEYWORD,
