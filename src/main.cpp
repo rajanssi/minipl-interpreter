@@ -43,8 +43,8 @@ int main(int argc, char *argv[]) {
 
   scanner->scanSource();
   // NOTE: Print tokens for show
-  //printTokens(scanner->tokens);
+  printTokens(scanner->tokens);
   parser->makeAST();
-
+  parser->rootNode->print();
   return 0;
 }

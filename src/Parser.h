@@ -15,10 +15,10 @@ public:
     };
 
     void makeAST();
+    std::unique_ptr<ASTRoot> rootNode;
 
 private:
     Scanner &scanner_;
-    std::unique_ptr<ASTRoot> rootNode_;
 
     std::vector<Token>::iterator tokenIterator_;
 
@@ -26,6 +26,10 @@ private:
     ASTDeclaration* makeDeclaration(TokenIterator &it);
     ASTAssignment* makeAssignment(TokenIterator &it);
     ASTExpression* makeExpression(TokenIterator &it);
+
+    ASTExpression* parseAddSub(TokenIterator &it);
+    ASTExpression* parseMulDiv(TokenIterator &it);
+    ASTExpression* parsePrimary(TokenIterator &it);
 
 
     bool match(TokenIterator &it, TokenType type);

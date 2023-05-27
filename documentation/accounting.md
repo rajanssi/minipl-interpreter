@@ -17,3 +17,5 @@
 18.5 - Started working on parser - 2h
 
 19.5 - Workder on parsing - 4h
+
+27.5 - Worked on parsing expressions - 4h
