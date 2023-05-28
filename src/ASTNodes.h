@@ -30,10 +30,13 @@ private:
 class ASTStatement : public ASTNode {
 public:
   void addDeclaration(ASTDeclaration *newDeclaration);
+  void addAssignment(ASTAssignment* newAssignment);
+
   void print(int indent = 0);
 
 private:
   ASTDeclaration *declaration_ = nullptr;
+  ASTAssignment *assignment_ = nullptr;
 };
 
 class ASTExpression : public ASTNode {
@@ -68,6 +71,7 @@ public:
   void addIdentifier(std::string &varIdent);
   void addType(std::string &type);
   void addAssignment(ASTAssignment *assignment);
+
 
   void print(int indent = 0);
 

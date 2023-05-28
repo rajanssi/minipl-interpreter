@@ -23,11 +23,17 @@ void ASTStatement::print(int indent) {
   std::cout << "Statement: \n";
   if (declaration_) {
     declaration_->print(indent + 2);
+  } else if (assignment_) {
+      assignment_->print(indent + 2);
   }
 }
 
 void ASTStatement::addDeclaration(ASTDeclaration *newDeclaration) {
   declaration_ = newDeclaration;
+}
+
+void ASTStatement::addAssignment(ASTAssignment *newAssignment) {
+    assignment_  = newAssignment;
 }
 
 void ASTDeclaration::print(int indent) {
