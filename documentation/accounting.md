@@ -21,3 +21,5 @@
 27.5 - Worked on parsing expressions - 4h
 
 28.5 - Worked more on parsing - 2h
+
+29.5 - Worked on parsing and started work on semantic analysis - 1h

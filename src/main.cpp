@@ -1,6 +1,7 @@
 #include <memory>
 #include "Scanner.h"
 #include "Parser.h"
+#include "SemanticAnalyzer.h"
 
 inline void argumentError(int argc) {
   if (argc == 1) {
@@ -40,6 +41,8 @@ int main(int argc, char *argv[]) {
   }
 
   parser = std::make_unique<Parser>(*scanner);
+
+  SemanticAnalyzer semanticAnalyzer(parser->rootNode);
 
   scanner->scanSource();
   // NOTE: Print tokens for show
