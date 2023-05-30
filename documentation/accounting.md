@@ -23,3 +23,5 @@
 28.5 - Worked more on parsing - 2h
 
 29.5 - Worked on parsing and started work on semantic analysis - 1h
+
+30.5 - Worked on symbol table - 2h
