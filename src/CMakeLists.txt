@@ -6,7 +6,7 @@ set(PROJECT_SOURCES
   Parser.h
   ASTNodes.cpp
   ASTNodes.h
-        SemanticAnalyzer.cpp SemanticAnalyzer.h SymbolTable.cpp SymbolTable.h)
+        SemanticAnalyzer.cpp SemanticAnalyzer.h SymbolTable.cpp SymbolTable.h Interpreter.cpp Interpreter.h)
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 

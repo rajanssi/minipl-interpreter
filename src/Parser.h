@@ -5,18 +5,18 @@
 
 #include "Scanner.h"
 #include "ASTNodes.h"
+#include "SymbolTable.h"
 
 using TokenIterator = std::vector<Token>::iterator;
 
 class Parser {
 public:
-    Parser(Scanner &scanner) : scanner_{scanner} {
+    Parser(Scanner &scanner, SymbolTable& symbolTable) : scanner_{scanner}, symbolTable_(symbolTable){
         tokenIterator_ = scanner_.tokens.begin();
     };
 
     void makeAST();
     std::unique_ptr<ASTRoot> rootNode;
-
 private:
     Scanner &scanner_;
 
@@ -36,4 +36,5 @@ private:
     TokenType peek(TokenIterator &it);
     void nextToken(TokenIterator &it);
 
+    SymbolTable& symbolTable_;
 };

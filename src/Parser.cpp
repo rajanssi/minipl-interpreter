@@ -26,6 +26,10 @@ ASTStatement *Parser::makeStatement(TokenIterator &it) {
             while (it->kind != END_LINE)
                 nextToken(it);
             return statement;
+        } else if (it->terminal == "for") {
+            while (it->kind != END_LINE)
+                nextToken(it);
+            return statement;
         }
     } else if (it->kind == TokenType::IDENTIFIER) {
         // Assignment
@@ -51,6 +55,19 @@ ASTDeclaration *Parser::makeDeclaration(TokenIterator &it) {
     match(it, TokenType::KEYWORD);
     std::string type = it->terminal;
     declaration->addType(const_cast<std::string &>(type));
+
+
+    if (type == "int") {
+        symbolTable_.addSymbol(identifier, new Symbol{SymbolType::INT, identifier, 0});
+    } else if (type == "string") {
+        symbolTable_.addSymbol(identifier, new Symbol{SymbolType::STRING, identifier, std::string("")});
+    } else if (type == "bool") {
+        symbolTable_.addSymbol(identifier, new Symbol{SymbolType::BOOL, identifier, false});
+    } else {
+        // TODO: sane error handling here
+        std::cerr << "Incorrect symbol type :" << type << '\n';
+        std::abort();
+    }
 
     if (peek(it) == TokenType::ASSIGNMENT) {
         auto *assignment = new ASTAssignment;
@@ -138,7 +155,7 @@ ASTExpression *Parser::parsePrimary(TokenIterator &it) {
         return new ASTExpression(ASTExpression::Type::BOOL, op);
     } else if (type == IDENTIFIER) {
         nextToken(it);
-        return new ASTExpression(ASTExpression::Type::STRING, op);
+        return new ASTExpression(ASTExpression::Type::IDENTIFIER, op);
     } else if (type == LEFT_PAR) {
         nextToken(it);
         auto expr = parseAddSub(it);

@@ -6,7 +6,8 @@
 enum class SymbolType {
     INT,
     STRING,
-    BOOL
+    BOOL,
+    UNDEFINED
 };
 
 class Symbol {
@@ -27,6 +28,7 @@ public:
 
     const SymbolType getType();
 
+    void print();
 private:
     SymbolType type;
     std::string id;
@@ -41,16 +43,17 @@ class SymbolTable {
 
 public:
     // TODO: get, set, etc
-    void addSymbol(std::string id, Symbol symbol);
 
-    void setSymbolValue(std::string id, std::string value);
-    void setSymbolValue(std::string id, int value);
-    void setSymbolValue(std::string id, bool value);
+    void setSymbolValue(std::string& id, std::string value);
+    void setSymbolValue(std::string& id, int value);
+    void setSymbolValue(std::string& id, bool value);
 
-    Symbol getSymbol(std::string id);
+    void addSymbol(std::string& id, Symbol* symbol);
+    Symbol &getSymbol(std::string id);
 
+    void printSymbols();
 private:
-    std::unordered_map<std::string, Symbol> symbolTable_;
+    std::unordered_map<std::string, Symbol*> symbolTable_;
 
     void addSymbol(std::string id, Symbol &symbol);
 };

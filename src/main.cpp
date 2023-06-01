@@ -39,22 +39,20 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    parser = std::make_unique<Parser>(*scanner);
+    SymbolTable symbolTable_;
+    parser = std::make_unique<Parser>(*scanner, symbolTable_);
 
-    SemanticAnalyzer semanticAnalyzer(parser->rootNode);
+    SemanticAnalyzer semanticAnalyzer(parser->rootNode, symbolTable_);
+    semanticAnalyzer.printSwitch = true;
 
     scanner->scanSource();
     // NOTE: Print tokens for show
     printTokens(scanner->tokens);
     parser->makeAST();
-    //parser->rootNode->print();
+    parser->rootNode->print();
+    symbolTable_.printSymbols();
 
-    std::string id = "idA";
-    Symbol s1(SymbolType::INT, id, 3);
-    //Symbol s2(SymbolType::INT, (std::string &) "idA", "hh!");
-    //Symbol s3(SymbolType::INT, (std::string &) "idA", true);
+    semanticAnalyzer.beginAnalysis();
 
-    std::cout << s1.getId() << s1.getIntValue() << '\n';
-    //std::cout << s2.getId() << s2.getStringValue() << '\n';
     return 0;
 }

@@ -74,7 +74,7 @@ void ASTAssignment::addExpression(ASTExpression *expression) {
 }
 
 void ASTExpression::print(int indent) {
-    if (type == Type::NUMBER) {
+    if (type == Type::NUMBER || type == Type::IDENTIFIER || type == Type::STRING || type == Type::BOOL) {
         std::cout << " " << value;
     } else {
         std::cout << " (";

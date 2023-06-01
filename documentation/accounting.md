@@ -25,3 +25,5 @@
 29.5 - Worked on parsing and started work on semantic analysis - 1h
 
 30.5 - Worked on symbol table - 2h
+
+31.5 - Worked on semantic analysis for arithmetic expressions - 3h
