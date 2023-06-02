@@ -27,3 +27,5 @@
 30.5 - Worked on symbol table - 2h
 
 31.5 - Worked on semantic analysis for arithmetic expressions - 3h
+
+2.6 - Worken on interpreting expressions - 2h

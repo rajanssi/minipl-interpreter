@@ -15,4 +15,13 @@ private:
     std::unique_ptr<ASTRoot> &astRoot_;
     SymbolTable &symbolTable_;
 
+    void interpretStatement(ASTStatement *statement);
+
+    void interpretDeclaration(ASTDeclaration *declaration);
+
+    template<typename T>
+    T interpretAssignment(ASTAssignment *assignment);
+
+    template<typename T>
+    T interpretExpression(ASTExpression *expression);
 };

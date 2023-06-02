@@ -2,6 +2,7 @@
 #include "Scanner.h"
 #include "Parser.h"
 #include "SemanticAnalyzer.h"
+#include "Interpreter.h"
 
 inline void argumentError(int argc) {
     if (argc == 1) {
@@ -53,6 +54,9 @@ int main(int argc, char *argv[]) {
     symbolTable_.printSymbols();
 
     semanticAnalyzer.beginAnalysis();
+
+    Interpreter interpreter(parser->rootNode, symbolTable_);
+    interpreter.interpret();
 
     return 0;
 }

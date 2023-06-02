@@ -71,6 +71,7 @@ SymbolType SemanticAnalyzer::checkExpression(ASTExpression *expression) {
     auto rType = checkExpression(expression->right);
 
     if (lType != rType) {
+        // TODO: Checks for boolean logic
         if (expression->type == Type::EQ || expression->type == Type::LESS) {
 
         }
