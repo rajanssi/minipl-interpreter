@@ -5,20 +5,15 @@
 #include <variant>
 #include <vector>
 
-class ASTStatement;
-
-class ASTDeclaration;
-
-class ASTExpression;
-
-class ASTAssignment;
-
-class ASTOperand;
+struct ASTStatement;
+struct ASTDeclaration;
+struct ASTExpression;
+struct ASTAssignment;
+struct ASTRead;
+struct ASTPrint;
 
 class ASTNode {
-public:
     void print(int indent = 0) {};
-private:
 };
 
 struct ASTRoot {
@@ -33,17 +28,19 @@ struct ASTRoot {
 
 struct ASTStatement {
     void addDeclaration(ASTDeclaration *newDeclaration);
-
     void addAssignment(ASTAssignment *newAssignment);
+    void addRead(ASTRead* newRead);
+    void addPrint(ASTPrint* newPrint);
 
     void print(int indent = 0);
 
     ASTDeclaration *declaration_ = nullptr;
     ASTAssignment *assignment_ = nullptr;
+    ASTRead* read_ = nullptr;
+    ASTPrint* print_ = nullptr;
 };
 
 struct ASTExpression {
-public:
     enum class Type {
         ADDITION,
         SUBTRACTION,
@@ -88,4 +85,19 @@ struct ASTAssignment {
 
     std::string varIdent_;
     ASTExpression *expression_;
+};
+
+struct ASTRead {
+    void addIdentifier(std::string &varIdent);
+
+    void print(int indent = 0);
+    std::string varIdent_;
+};
+
+struct ASTPrint {
+    void addExpression(ASTExpression* expression);
+
+    void print(int indent = 0);
+
+    ASTExpression* expression_;
 };

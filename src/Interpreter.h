@@ -24,4 +24,6 @@ private:
 
     template<typename T>
     T interpretExpression(ASTExpression *expression);
+
+    void interpretPrint(ASTPrint *print);
 };

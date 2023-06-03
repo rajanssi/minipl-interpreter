@@ -8,6 +8,10 @@ void SemanticAnalyzer::beginAnalysis() {
             checkDeclaration(s->declaration_);
         } else if (s->assignment_) {
             checkAssignment(s->assignment_);
+        } else if (s->print_) {
+            checkPrint(s->print_);
+        } else if (s->read_) {
+            checkRead(s->read_);
         }
     }
 }
@@ -48,6 +52,20 @@ void SemanticAnalyzer::checkAssignment(ASTAssignment *assignment) {
                   << typePrinter(type) << '\n';
         std::abort();
     }
+}
+
+
+void SemanticAnalyzer::checkPrint(ASTPrint *print) {
+    auto type = checkExpression(print->expression_);
+    if (type == SymbolType::BOOL) {
+        std::cerr << "Semantic error: can't print out boolean values\n";
+        std::abort();
+    }
+}
+
+void SemanticAnalyzer::checkRead(ASTRead *read) {
+    auto id = read->varIdent_;
+    symbolTable_.getSymbol(id);
 }
 
 SymbolType SemanticAnalyzer::checkExpression(ASTExpression *expression) {
@@ -92,6 +110,5 @@ std::string SemanticAnalyzer::typePrinter(SymbolType type) {
         case SymbolType::UNDEFINED:
             return "UNDEFINED";
     }
-
     return "ERROR";
 }

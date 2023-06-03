@@ -44,14 +44,16 @@ int main(int argc, char *argv[]) {
     parser = std::make_unique<Parser>(*scanner, symbolTable_);
 
     SemanticAnalyzer semanticAnalyzer(parser->rootNode, symbolTable_);
-    semanticAnalyzer.printSwitch = true;
 
     scanner->scanSource();
-    // NOTE: Print tokens for show
-    printTokens(scanner->tokens);
     parser->makeAST();
+
+    /*
+    printTokens(scanner->tokens);
     parser->rootNode->print();
     symbolTable_.printSymbols();
+    semanticAnalyzer.printSwitch = true;
+     */
 
     semanticAnalyzer.beginAnalysis();
 

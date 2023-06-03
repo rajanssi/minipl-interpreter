@@ -51,6 +51,7 @@ public:
     void addSymbol(std::string& id, Symbol* symbol);
     Symbol &getSymbol(std::string id);
 
+
     void printSymbols();
 private:
     std::unordered_map<std::string, Symbol*> symbolTable_;

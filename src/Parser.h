@@ -26,6 +26,8 @@ private:
     ASTDeclaration* makeDeclaration(TokenIterator &it);
     ASTAssignment* makeAssignment(TokenIterator &it);
     ASTExpression* makeExpression(TokenIterator &it);
+    ASTRead* makeRead(TokenIterator &it);
+    ASTPrint* makePrint(TokenIterator &it);
 
     ASTExpression* parseAddSub(TokenIterator &it);
     ASTExpression* parseMulDiv(TokenIterator &it);

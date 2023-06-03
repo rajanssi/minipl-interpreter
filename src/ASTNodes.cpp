@@ -25,6 +25,10 @@ void ASTStatement::print(int indent) {
         declaration_->print(indent + 2);
     } else if (assignment_) {
         assignment_->print(indent + 2);
+    } else if (read_) {
+        read_->print(indent + 2);
+    } else if (print_) {
+        print_->print(indent + 2);
     }
 }
 
@@ -34,6 +38,14 @@ void ASTStatement::addDeclaration(ASTDeclaration *newDeclaration) {
 
 void ASTStatement::addAssignment(ASTAssignment *newAssignment) {
     assignment_ = newAssignment;
+}
+
+void ASTStatement::addRead(ASTRead *newRead) {
+    read_ = newRead;
+}
+
+void ASTStatement::addPrint(ASTPrint *newPrint) {
+    print_ = newPrint;
 }
 
 void ASTDeclaration::print(int indent) {
@@ -84,4 +96,24 @@ void ASTExpression::print(int indent) {
         std::cout << " )";
     }
 
+}
+
+void ASTRead::addIdentifier(std::string &varIdent) {
+    varIdent_ = varIdent;
+}
+
+void ASTRead::print(int indent) {
+    std::string indentStr(indent, ' ');
+    std::cout << indentStr << "Read: " << varIdent_ << '\n';
+}
+
+void ASTPrint::addExpression(ASTExpression *expression) {
+    expression_ = expression;
+}
+
+void ASTPrint::print(int indent) {
+    std::string indentStr(indent, ' ');
+    std::cout << indentStr << "Print:";
+    expression_->print(indent);
+    std::cout << std::endl;
 }

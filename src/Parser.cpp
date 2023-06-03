@@ -19,14 +19,16 @@ ASTStatement *Parser::makeStatement(TokenIterator &it) {
             nextToken(it);
             statement->addDeclaration(makeDeclaration(it));
         } else if (it->terminal == "read") {
-            while (it->kind != END_LINE)
-                nextToken(it);
-            return statement;
+            nextToken(it);
+            statement->addRead(makeRead(it));
         } else if (it->terminal == "print") {
+            nextToken(it);
+            statement->addPrint(makePrint(it));
+        } else if (it->terminal == "for") {
             while (it->kind != END_LINE)
                 nextToken(it);
             return statement;
-        } else if (it->terminal == "for") {
+        } else if (it->terminal == "if") {
             while (it->kind != END_LINE)
                 nextToken(it);
             return statement;
@@ -36,6 +38,7 @@ ASTStatement *Parser::makeStatement(TokenIterator &it) {
         statement->addAssignment(makeAssignment(it));
         return statement;
     } else {
+        // TODO: Shouldn't go here, so error handling
         while (it->kind != END_LINE)
             nextToken(it);
         return statement;
@@ -97,6 +100,22 @@ ASTAssignment *Parser::makeAssignment(TokenIterator &it) {
 
 ASTExpression *Parser::makeExpression(TokenIterator &it) {
     return parseAddSub(it);
+}
+
+ASTRead *Parser::makeRead(TokenIterator &it) {
+    auto read = new ASTRead();
+    match(it, TokenType::IDENTIFIER);
+    read->addIdentifier(const_cast<std::string &>(it->terminal));
+    nextToken(it);
+    match(it, TokenType::END_LINE);
+    return read;
+}
+
+ASTPrint *Parser::makePrint(TokenIterator &it) {
+    auto print = new ASTPrint();
+    print->addExpression(makeExpression(it));
+    match(it, TokenType::END_LINE);
+    return print;
 }
 
 ASTExpression *Parser::parseAddSub(TokenIterator &it) {

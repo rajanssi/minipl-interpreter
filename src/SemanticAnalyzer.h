@@ -24,6 +24,10 @@ private:
     SymbolType checkExpression(ASTExpression *expression);
 
     std::string typePrinter(SymbolType type);
+
+    void checkPrint(ASTPrint *print);
+
+    void checkRead(ASTRead *read);
 };
 
 
