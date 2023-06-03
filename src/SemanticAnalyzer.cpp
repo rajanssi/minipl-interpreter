@@ -2,7 +2,6 @@
 #include "SemanticAnalyzer.h"
 
 void SemanticAnalyzer::beginAnalysis() {
-    int x = 3;
     for (auto s: astRoot_->statementList_) {
         if (s->declaration_) {
             checkDeclaration(s->declaration_);
@@ -90,7 +89,7 @@ SymbolType SemanticAnalyzer::checkExpression(ASTExpression *expression) {
 
     if (lType != rType) {
         // TODO: Checks for boolean logic
-        if (expression->type == Type::EQ || expression->type == Type::LESS) {
+        if (expression->type == Type::EQ || expression->type == Type::LESS || expression->type == Type::AND) {
 
         }
         return SymbolType::UNDEFINED;

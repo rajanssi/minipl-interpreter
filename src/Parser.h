@@ -29,6 +29,7 @@ private:
     ASTRead* makeRead(TokenIterator &it);
     ASTPrint* makePrint(TokenIterator &it);
 
+    ASTExpression *parseLogic(TokenIterator &it);
     ASTExpression* parseAddSub(TokenIterator &it);
     ASTExpression* parseMulDiv(TokenIterator &it);
     ASTExpression* parsePrimary(TokenIterator &it);
@@ -39,4 +40,5 @@ private:
     void nextToken(TokenIterator &it);
 
     SymbolTable& symbolTable_;
+
 };

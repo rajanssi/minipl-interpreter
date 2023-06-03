@@ -1,8 +1,8 @@
-21.5 - Setting up repository for project - 0.5h
+21.4 - Setting up repository for project - 0.5h
 
-27.5 - Worked on file reading and basic scanning - 2h
+27.4 - Worked on file reading and basic scanning - 2h
 
-28.5 - Worked on scanner, it now reads string literals to tokens - 2h
+28.4 - Worked on scanner, it now reads string literals to tokens - 2h
 
 4.5  - Worked some more on scanner and improved project layout - 2h
 
@@ -30,4 +30,4 @@
 
 2.6 - Worked on interpreting expressions - 2h
 
-3.6 - Worked on input and output - 3h
+3.6 - Worked on input and output and boolean expression evaluation - 5h

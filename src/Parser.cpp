@@ -98,10 +98,6 @@ ASTAssignment *Parser::makeAssignment(TokenIterator &it) {
     return assignment;
 }
 
-ASTExpression *Parser::makeExpression(TokenIterator &it) {
-    return parseAddSub(it);
-}
-
 ASTRead *Parser::makeRead(TokenIterator &it) {
     auto read = new ASTRead();
     match(it, TokenType::IDENTIFIER);
@@ -116,6 +112,38 @@ ASTPrint *Parser::makePrint(TokenIterator &it) {
     print->addExpression(makeExpression(it));
     match(it, TokenType::END_LINE);
     return print;
+}
+
+ASTExpression *Parser::makeExpression(TokenIterator &it) {
+    return parseLogic(it);
+}
+
+ASTExpression *Parser::parseLogic(TokenIterator &it) {
+    auto leftOperand = parseAddSub(it);
+
+    while (it->terminal == "=" || it->terminal == "&" || it->terminal == "<") {
+        auto op = it->terminal;
+        nextToken(it);
+
+        auto rightOperand = parseAddSub(it);
+
+        ASTExpression::Type type;
+        if (op == "=") {
+            type = ASTExpression::Type::EQ;
+        } else if (op == "&") {
+            type = ASTExpression::Type::AND;
+        } else {
+            type = ASTExpression::Type::LESS;
+        }
+
+        auto node = new ASTExpression(type, op);
+        node->left = leftOperand;
+        node->right = rightOperand;
+
+        leftOperand = node;
+    }
+
+    return leftOperand;
 }
 
 ASTExpression *Parser::parseAddSub(TokenIterator &it) {
@@ -177,10 +205,16 @@ ASTExpression *Parser::parsePrimary(TokenIterator &it) {
         return new ASTExpression(ASTExpression::Type::IDENTIFIER, op);
     } else if (type == LEFT_PAR) {
         nextToken(it);
-        auto expr = parseAddSub(it);
+        auto expr = parseLogic(it);
         match(it, RIGHT_PAR);
         nextToken(it);
         return expr;
+    } else if (op == "!") {
+        nextToken(it);
+        auto leftOpnd = parseLogic(it);
+        auto unary = new ASTExpression(ASTExpression::Type::NOT, op);
+        unary->left = leftOpnd;
+        return unary;
     }
     // TODO: Sane error checking
     std::cerr << "Unexpected token, terminating\n";

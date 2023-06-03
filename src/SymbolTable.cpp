@@ -48,7 +48,7 @@ void Symbol::print() {
             std::cout << "[ " << id << ", string, " << s_ << " ]\n";
             break;
         case SymbolType::BOOL:
-            std::cout << "[ " << id << ", int, " << b_ << " ]\n";
+            std::cout << "[ " << id << ", bool, " << b_ << " ]\n";
             break;
     }
 }

@@ -11,7 +11,22 @@ void Interpreter::interpretStatement(ASTStatement *statement) {
     if (statement->declaration_) {
         interpretDeclaration(statement->declaration_);
     } else if (statement->assignment_) {
-        interpretAssignment<int>(statement->assignment_);
+        auto id = statement->assignment_->varIdent_;
+        auto type = symbolTable_.getSymbol(id).getType();
+        switch (type) {
+            case SymbolType::INT:
+                interpretAssignment<int>(statement->assignment_);
+                return;
+            case SymbolType::STRING:
+                interpretAssignment<std::string>(statement->assignment_);
+                return;
+            case SymbolType::BOOL:
+                interpretAssignment<bool>(statement->assignment_);
+                return;
+            case SymbolType::UNDEFINED:
+                break;
+        }
+
     } else if (statement->print_) {
         interpretPrint(statement->print_);
     } else if (statement->read_) {
@@ -43,10 +58,11 @@ void Interpreter::interpretDeclaration(ASTDeclaration *declaration) {
 template<typename T>
 T Interpreter::interpretAssignment(ASTAssignment *assignment) {
     if (assignment->expression_) {
-        auto val = interpretExpression<T>(assignment->expression_);
+        T val;
+        val = interpretExpression<T>(assignment->expression_);
         symbolTable_.setSymbolValue(assignment->varIdent_, val);
+        return val;
     }
-    return 0;
 }
 
 template<>
@@ -99,9 +115,11 @@ bool Interpreter::interpretExpression(ASTExpression *expression) {
         case ASTExpression::Type::NOT:
             // TODO: Not implemented yet
             break;
-        case ASTExpression::Type::AND:
-            // TODO: Not implemented yet
-            break;
+        case ASTExpression::Type::AND: {
+            bool lVal = interpretExpression<bool>(expression->left);
+            bool rVal = interpretExpression<bool>(expression->right);
+            return lVal && rVal;
+        }
         case ASTExpression::Type::EQ:
             // TODO: Not implemented yet
             break;
@@ -109,10 +127,10 @@ bool Interpreter::interpretExpression(ASTExpression *expression) {
             // TODO: Not implemented yet
             break;
         case ASTExpression::Type::BOOL:
-            // TODO: Not implemented yet
-            break;
+            if (expression->value == "true") return true;
+            return false;
         case ASTExpression::Type::IDENTIFIER:
-            return symbolTable_.getSymbol(expression->value).getIntValue();
+            return symbolTable_.getSymbol(expression->value).getBoolValue();
     }
 
 }
