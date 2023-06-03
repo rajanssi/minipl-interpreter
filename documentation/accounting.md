@@ -28,4 +28,6 @@
 
 31.5 - Worked on semantic analysis for arithmetic expressions - 3h
 
-2.6 - Worken on interpreting expressions - 2h
+2.6 - Worked on interpreting expressions - 2h
+
+3.6 - Worked on input and output - 3h
