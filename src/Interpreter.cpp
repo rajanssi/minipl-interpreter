@@ -14,6 +14,8 @@ void Interpreter::interpretStatement(ASTStatement *statement) {
         interpretAssignment<int>(statement->assignment_);
     } else if (statement->print_) {
         interpretPrint(statement->print_);
+    } else if (statement->read_) {
+        interpretRead(statement->read_);
     }
 
 }
@@ -41,7 +43,7 @@ void Interpreter::interpretDeclaration(ASTDeclaration *declaration) {
 template<typename T>
 T Interpreter::interpretAssignment(ASTAssignment *assignment) {
     if (assignment->expression_) {
-        auto val = interpretExpression<int>(assignment->expression_);
+        auto val = interpretExpression<T>(assignment->expression_);
         symbolTable_.setSymbolValue(assignment->varIdent_, val);
     }
     return 0;
@@ -72,6 +74,28 @@ int Interpreter::interpretExpression(ASTExpression *expression) {
         }
         case ASTExpression::Type::NUMBER:
             return std::stoi(expression->value);
+        case ASTExpression::Type::IDENTIFIER:
+            return symbolTable_.getSymbol(expression->value).getIntValue();
+    }
+
+    // TODO: error handling if it gets here
+    return 0xdeadbeef;
+}
+
+template<>
+std::string Interpreter::interpretExpression(ASTExpression *expression) {
+    switch (expression->type) {
+        case ASTExpression::Type::STRING:
+            return expression->value;
+        case ASTExpression::Type::IDENTIFIER:
+            return symbolTable_.getSymbol(expression->value).getStringValue();
+    }
+    return "Error interpreting string\n";
+}
+
+template<>
+bool Interpreter::interpretExpression(ASTExpression *expression) {
+    switch (expression->type) {
         case ASTExpression::Type::NOT:
             // TODO: Not implemented yet
             break;
@@ -91,18 +115,6 @@ int Interpreter::interpretExpression(ASTExpression *expression) {
             return symbolTable_.getSymbol(expression->value).getIntValue();
     }
 
-    return 0xdeadbeef;
-}
-
-template<>
-std::string Interpreter::interpretExpression(ASTExpression *expression) {
-    switch (expression->type) {
-        case ASTExpression::Type::STRING:
-            return expression->value;
-        case ASTExpression::Type::IDENTIFIER:
-            return symbolTable_.getSymbol(expression->value).getStringValue();
-    }
-    return "Error interpreting string\n";
 }
 
 void Interpreter::interpretPrint(ASTPrint *print) {
@@ -149,6 +161,45 @@ void Interpreter::interpretPrint(ASTPrint *print) {
                     std::abort();
                     break;
             }
+        }
+    }
+}
+
+void Interpreter::interpretRead(ASTRead *read) {
+    auto type = symbolTable_.getSymbol(read->varIdent_).getType();
+    switch (type) {
+        case SymbolType::INT: {
+            int value;
+            try {
+                std::cin >> value;
+            } catch (std::runtime_error e) {
+                std::cerr << e.what() << '\n';
+                std::abort();
+            }
+            symbolTable_.setSymbolValue(read->varIdent_, value);
+            return;
+        }
+        case SymbolType::STRING: {
+            std::string value;
+            try {
+                std::cin >> value;
+            } catch (std::runtime_error e) {
+                std::cerr << e.what() << '\n';
+                std::abort();
+            }
+            symbolTable_.setSymbolValue(read->varIdent_, value);
+            return;
+        }
+        case SymbolType::BOOL: {
+            bool value;
+            try {
+                std::cin >> value;
+            } catch (std::runtime_error e) {
+                std::cerr << e.what() << '\n';
+                std::abort();
+            }
+            symbolTable_.setSymbolValue(read->varIdent_, value);
+            return;
         }
     }
 }

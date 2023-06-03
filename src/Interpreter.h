@@ -26,4 +26,5 @@ private:
     T interpretExpression(ASTExpression *expression);
 
     void interpretPrint(ASTPrint *print);
+    void interpretRead(ASTRead * read);
 };
