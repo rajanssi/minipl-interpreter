@@ -127,13 +127,32 @@ ASTExpression *Parser::parseLogic(TokenIterator &it) {
 
         auto rightOperand = parseAddSub(it);
 
-        ASTExpression::Type type;
+        ASTExpression::Type type = leftOperand->type;
+        SymbolType t;
+        if (type == ASTExpression::Type::IDENTIFIER) {
+            t = symbolTable_.getSymbol(leftOperand->value).getType();
+        } else if (type == ASTExpression::Type::BOOL || type == ASTExpression::Type::LESS_BOOL ||
+                   type == ASTExpression::Type::EQ_BOOL || type == ASTExpression::Type::LESS_STR ||
+                   type == ASTExpression::Type::EQ_STR || type == ASTExpression::Type::LESS_NUM ||
+                   type == ASTExpression::Type::EQ_NUM) {
+            t = SymbolType::BOOL;
+        }
         if (op == "=") {
-            type = ASTExpression::Type::EQ;
-        } else if (op == "&") {
-            type = ASTExpression::Type::AND;
+            if (t == SymbolType::INT)
+                type = ASTExpression::Type::EQ_NUM;
+            if (t == SymbolType::BOOL)
+                type = ASTExpression::Type::EQ_BOOL;
+            if (t == SymbolType::STRING)
+                type = ASTExpression::Type::EQ_STR;
+        } else if (op == "<") {
+            if (t == SymbolType::INT)
+                type = ASTExpression::Type::LESS_NUM;
+            if (t == SymbolType::BOOL)
+                type = ASTExpression::Type::LESS_BOOL;
+            if (t == SymbolType::STRING)
+                type = ASTExpression::Type::LESS_STR;
         } else {
-            type = ASTExpression::Type::LESS;
+            type = ASTExpression::Type::AND;
         }
 
         auto node = new ASTExpression(type, op);
@@ -217,7 +236,7 @@ ASTExpression *Parser::parsePrimary(TokenIterator &it) {
         return unary;
     }
     // TODO: Sane error checking
-    std::cerr << "Unexpected token, terminating\n";
+    std::cerr << "Parsing error: Unexpected token, terminating\n";
     std::abort();
 }
 

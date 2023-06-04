@@ -28,16 +28,19 @@ struct ASTRoot {
 
 struct ASTStatement {
     void addDeclaration(ASTDeclaration *newDeclaration);
+
     void addAssignment(ASTAssignment *newAssignment);
-    void addRead(ASTRead* newRead);
-    void addPrint(ASTPrint* newPrint);
+
+    void addRead(ASTRead *newRead);
+
+    void addPrint(ASTPrint *newPrint);
 
     void print(int indent = 0);
 
     ASTDeclaration *declaration_ = nullptr;
     ASTAssignment *assignment_ = nullptr;
-    ASTRead* read_ = nullptr;
-    ASTPrint* print_ = nullptr;
+    ASTRead *read_ = nullptr;
+    ASTPrint *print_ = nullptr;
 };
 
 struct ASTExpression {
@@ -49,8 +52,12 @@ struct ASTExpression {
         NUMBER,
         NOT,
         AND,
-        EQ,
-        LESS,
+        EQ_NUM,
+        EQ_BOOL,
+        EQ_STR,
+        LESS_NUM,
+        LESS_BOOL,
+        LESS_STR,
         STRING,
         BOOL,
         IDENTIFIER
@@ -69,8 +76,11 @@ struct ASTExpression {
 
 struct ASTDeclaration {
     void addIdentifier(std::string &varIdent);
+
     void addType(std::string &type);
+
     void addAssignment(ASTAssignment *assignment);
+
     void print(int indent = 0);
 
     std::string varIdent_;
@@ -80,7 +90,9 @@ struct ASTDeclaration {
 
 struct ASTAssignment {
     void addIdentifier(std::string &varIdent);
+
     void addExpression(ASTExpression *expression);
+
     void print(int indent = 0);
 
     std::string varIdent_;
@@ -91,13 +103,14 @@ struct ASTRead {
     void addIdentifier(std::string &varIdent);
 
     void print(int indent = 0);
+
     std::string varIdent_;
 };
 
 struct ASTPrint {
-    void addExpression(ASTExpression* expression);
+    void addExpression(ASTExpression *expression);
 
     void print(int indent = 0);
 
-    ASTExpression* expression_;
+    ASTExpression *expression_;
 };

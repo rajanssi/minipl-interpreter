@@ -47,7 +47,7 @@ void SemanticAnalyzer::checkAssignment(ASTAssignment *assignment) {
 
     if (exprType != type) {
         // TODO: Some sane error handling here
-        std::cerr << "Cannot assign " << typePrinter(exprType) << " to variable " << id << " of type "
+        std::cerr << "Semantic error: Cannot assign " << typePrinter(exprType) << " to variable " << id << " of type "
                   << typePrinter(type) << '\n';
         std::abort();
     }
@@ -68,34 +68,43 @@ void SemanticAnalyzer::checkRead(ASTRead *read) {
 }
 
 SymbolType SemanticAnalyzer::checkExpression(ASTExpression *expression) {
-    typedef ASTExpression::Type Type;
-    Type type = expression->type;
+    ASTExpression::Type type = expression->type;
 
     switch (type) {
-        case Type::NUMBER:
+        case ASTExpression::Type::NUMBER:
             return SymbolType::INT;
-        case Type::STRING:
+        case ASTExpression::Type::STRING:
             return SymbolType::STRING;
-        case Type::BOOL:
+        case ASTExpression::Type::BOOL:
             return SymbolType::BOOL;
-        case Type::IDENTIFIER:
+        case ASTExpression::Type::IDENTIFIER:
             return symbolTable_.getSymbol(expression->value).getType();
-        case Type::NOT:
-            return SymbolType::UNDEFINED;
+        case ASTExpression::Type::NOT:
+            checkExpression(expression->left);
+            return SymbolType::BOOL;
     }
 
     auto lType = checkExpression(expression->left);
     auto rType = checkExpression(expression->right);
 
     if (lType != rType) {
-        // TODO: Checks for boolean logic
-        if (expression->type == Type::EQ || expression->type == Type::LESS || expression->type == Type::AND) {
-
-        }
         return SymbolType::UNDEFINED;
     }
-
-    return lType;
+    switch (type) {
+        case ASTExpression::Type::AND: {
+            if (lType == SymbolType::BOOL)
+                return SymbolType::BOOL;
+            else
+                return SymbolType::UNDEFINED;
+            case ASTExpression::Type::EQ_NUM:
+            case ASTExpression::Type::LESS_NUM:
+            case ASTExpression::Type::EQ_BOOL:
+            case ASTExpression::Type::LESS_BOOL:
+            case ASTExpression::Type::EQ_STR:
+            case ASTExpression::Type::LESS_STR:
+                return lType == rType ? SymbolType::BOOL : SymbolType::UNDEFINED;
+        }
+    }
 }
 
 std::string SemanticAnalyzer::typePrinter(SymbolType type) {

@@ -88,6 +88,12 @@ void ASTAssignment::addExpression(ASTExpression *expression) {
 void ASTExpression::print(int indent) {
     if (type == Type::NUMBER || type == Type::IDENTIFIER || type == Type::STRING || type == Type::BOOL) {
         std::cout << " " << value;
+    } else if (type == Type::NOT) {
+        std::cout << " ( ";
+        std::cout << " " << value;
+        left->print(indent);
+        std::cout << " )";
+
     } else {
         std::cout << " (";
         std::cout << " " << value;

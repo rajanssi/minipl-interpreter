@@ -24,7 +24,9 @@ void Interpreter::interpretStatement(ASTStatement *statement) {
                 interpretAssignment<bool>(statement->assignment_);
                 return;
             case SymbolType::UNDEFINED:
-                break;
+                // TODO: Error handling
+                std::cerr << "Cannot interpret undefined symbol\n";
+                std::abort();
         }
 
     } else if (statement->print_) {
@@ -105,30 +107,63 @@ std::string Interpreter::interpretExpression(ASTExpression *expression) {
             return expression->value;
         case ASTExpression::Type::IDENTIFIER:
             return symbolTable_.getSymbol(expression->value).getStringValue();
+        case ASTExpression::Type::ADDITION: {
+            auto lVal = interpretExpression<std::string>(expression->left);
+            auto rVal = interpretExpression<std::string>(expression->right);
+            return lVal + rVal;
+        }
+        case ASTExpression::Type::EQ_STR: {
+            break;
+        }
     }
-    return "Error interpreting string\n";
+    std::cerr << "Error interpreting string\n";
+    std::abort();
 }
 
 template<>
 bool Interpreter::interpretExpression(ASTExpression *expression) {
     switch (expression->type) {
-        case ASTExpression::Type::NOT:
-            // TODO: Not implemented yet
-            break;
+        case ASTExpression::Type::NOT: {
+            bool val = interpretExpression<bool>(expression->left);
+            return !val;
+        }
         case ASTExpression::Type::AND: {
             bool lVal = interpretExpression<bool>(expression->left);
             bool rVal = interpretExpression<bool>(expression->right);
             return lVal && rVal;
         }
-        case ASTExpression::Type::EQ:
-            // TODO: Not implemented yet
-            break;
-        case ASTExpression::Type::LESS:
-            // TODO: Not implemented yet
-            break;
+        case ASTExpression::Type::EQ_NUM: {
+            int lVal = interpretExpression<int>(expression->left);
+            int rVal = interpretExpression<int>(expression->right);
+            return lVal == rVal;
+        }
+        case ASTExpression::Type::LESS_NUM: {
+            int lVal = interpretExpression<int>(expression->left);
+            int rVal = interpretExpression<int>(expression->right);
+            return lVal < rVal;
+        }
+        case ASTExpression::Type::EQ_STR: {
+            auto lVal = interpretExpression<std::string>(expression->left);
+            auto rVal = interpretExpression<std::string>(expression->right);
+            return lVal == rVal;
+        }
+        case ASTExpression::Type::LESS_STR: {
+            auto lVal = interpretExpression<std::string>(expression->left);
+            auto rVal = interpretExpression<std::string>(expression->right);
+            return lVal.length() < rVal.length();
+        }
+        case ASTExpression::Type::EQ_BOOL: {
+            bool lVal = interpretExpression<bool>(expression->left);
+            bool rVal = interpretExpression<bool>(expression->right);
+            return lVal == rVal;
+        }
+        case ASTExpression::Type::LESS_BOOL: {
+            bool lVal = interpretExpression<bool>(expression->left);
+            bool rVal = interpretExpression<bool>(expression->right);
+            return lVal < rVal;
+        }
         case ASTExpression::Type::BOOL:
-            if (expression->value == "true") return true;
-            return false;
+            return expression->value == "true";
         case ASTExpression::Type::IDENTIFIER:
             return symbolTable_.getSymbol(expression->value).getBoolValue();
     }
@@ -148,8 +183,8 @@ void Interpreter::interpretPrint(ASTPrint *print) {
         }
         case ASTExpression::Type::NOT:
         case ASTExpression::Type::AND:
-        case ASTExpression::Type::EQ:
-        case ASTExpression::Type::LESS:
+        case ASTExpression::Type::EQ_NUM:
+        case ASTExpression::Type::LESS_NUM:
         case ASTExpression::Type::BOOL: {
             std::cerr << "ERROR: Printing boolean value not allowed\n";
             std::abort();
