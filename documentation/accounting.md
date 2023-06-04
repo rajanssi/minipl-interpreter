@@ -32,4 +32,5 @@
 
 3.6 - Worked on input and output and boolean expression evaluation - 5h
 
-4.6 - Worked on boolean expression evaluation - 4h
+4.6 - Worked on boolean expression evaluation and if statements - 5h
+

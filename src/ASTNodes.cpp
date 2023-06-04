@@ -20,7 +20,8 @@ void ASTRoot::print(int indent) {
 }
 
 void ASTStatement::print(int indent) {
-    std::cout << "Statement: \n";
+    std::string indentStr(indent, ' ');
+    std::cout << indentStr << "Statement: \n";
     if (declaration_) {
         declaration_->print(indent + 2);
     } else if (assignment_) {
@@ -29,6 +30,8 @@ void ASTStatement::print(int indent) {
         read_->print(indent + 2);
     } else if (print_) {
         print_->print(indent + 2);
+    } else if (if_) {
+        if_->print(indent + 2);
     }
 }
 
@@ -46,6 +49,10 @@ void ASTStatement::addRead(ASTRead *newRead) {
 
 void ASTStatement::addPrint(ASTPrint *newPrint) {
     print_ = newPrint;
+}
+
+void ASTStatement::addIf(ASTIf *newIf) {
+    if_ = newIf;
 }
 
 void ASTDeclaration::print(int indent) {
@@ -122,4 +129,33 @@ void ASTPrint::print(int indent) {
     std::cout << indentStr << "Print:";
     expression_->print(indent);
     std::cout << std::endl;
+}
+
+void ASTIf::addCondition(ASTExpression *newCondition) {
+    condition_ = newCondition;
+}
+
+void ASTIf::addStatement(ASTStatement *newStatement) {
+    statementList_.push_back(newStatement);
+}
+
+void ASTIf::print(int indent) {
+    std::string indentStr(indent, ' ');
+    std::cout << indentStr << "If: ";
+    if (condition_) {
+        condition_->print(indent + 2);
+    }
+    std::cout << '\n';
+    for (auto& s : statementList_) {
+        s->print(indent + 2);
+    }
+}
+
+void ASTLoop::print(int indent) {
+
+}
+
+int ASTLoop::increment() {
+    current_++;
+    return current_;
 }

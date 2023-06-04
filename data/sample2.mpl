@@ -7,5 +7,5 @@ print x;
 print " : Hello, World!\n";
 end for;
 if x = ntimes do
- print “x is equal to ntimes”;
+ print "x is equal to ntimes";
 end if;

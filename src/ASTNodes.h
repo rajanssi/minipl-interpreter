@@ -11,6 +11,7 @@ struct ASTExpression;
 struct ASTAssignment;
 struct ASTRead;
 struct ASTPrint;
+struct ASTIf;
 
 class ASTNode {
     void print(int indent = 0) {};
@@ -35,12 +36,15 @@ struct ASTStatement {
 
     void addPrint(ASTPrint *newPrint);
 
+    void addIf(ASTIf* newIf);
+
     void print(int indent = 0);
 
     ASTDeclaration *declaration_ = nullptr;
     ASTAssignment *assignment_ = nullptr;
     ASTRead *read_ = nullptr;
     ASTPrint *print_ = nullptr;
+    ASTIf* if_ = nullptr;
 };
 
 struct ASTExpression {
@@ -113,4 +117,24 @@ struct ASTPrint {
     void print(int indent = 0);
 
     ASTExpression *expression_;
+};
+
+struct ASTIf {
+    void addCondition(ASTExpression* newCondition);
+    void addStatement(ASTStatement* newStatement);
+    void print(int indent = 0);
+
+    ASTExpression* condition_ = nullptr;
+    std::vector<ASTStatement*> statementList_;
+};
+
+struct ASTLoop {
+    void print(int indent = 0);
+
+    int increment();
+
+    int current_ = 0;
+    int end_ = 0;
+    std::string ctrlVarId_;
+    std::vector<ASTStatement*> statementList_;
 };

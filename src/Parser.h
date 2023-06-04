@@ -28,6 +28,8 @@ private:
     ASTExpression* makeExpression(TokenIterator &it);
     ASTRead* makeRead(TokenIterator &it);
     ASTPrint* makePrint(TokenIterator &it);
+    ASTIf* makeIf(TokenIterator &it);
+    ASTLoop* makeLoop(TokenIterator &it);
 
     ASTExpression *parseLogic(TokenIterator &it);
     ASTExpression* parseAddSub(TokenIterator &it);

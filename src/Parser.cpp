@@ -29,9 +29,8 @@ ASTStatement *Parser::makeStatement(TokenIterator &it) {
                 nextToken(it);
             return statement;
         } else if (it->terminal == "if") {
-            while (it->kind != END_LINE)
-                nextToken(it);
-            return statement;
+            nextToken(it);
+            statement->addIf(makeIf(it));
         }
     } else if (it->kind == TokenType::IDENTIFIER) {
         // Assignment
@@ -240,6 +239,24 @@ ASTExpression *Parser::parsePrimary(TokenIterator &it) {
     std::abort();
 }
 
+ASTIf* Parser::makeIf(TokenIterator &it) {
+    auto conditional = new ASTIf();
+    conditional->addCondition(makeExpression(it));
+    match(it, TokenType::KEYWORD);
+    nextToken(it);
+    while (it->terminal != "end") {
+        conditional->addStatement(makeStatement(it));
+        match(it, TokenType::END_LINE);
+        nextToken(it);
+    }
+    match(it, TokenType::KEYWORD);
+    nextToken(it);
+    match(it, TokenType::KEYWORD);
+    nextToken(it);
+    match(it, TokenType::END_LINE);
+    return conditional;
+}
+
 bool Parser::match(TokenIterator &it, TokenType type) {
     if (it->kind == type) {
         return true;
@@ -247,7 +264,7 @@ bool Parser::match(TokenIterator &it, TokenType type) {
 
     // TODO: Some sane error handling here
     std::cerr << "Parser error on line " << it->line << '\n';
-    std::cerr << "Expected " << type << " and got " << it->kind << "\n";
+    std::cerr << "Expected " << tokenStrings[type] << " and got " << tokenStrings[it->kind] << "\n";
     std::abort();
 }
 
