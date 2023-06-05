@@ -46,18 +46,21 @@ int main(int argc, char *argv[]) {
     SemanticAnalyzer semanticAnalyzer(parser->rootNode, symbolTable_);
 
     scanner->scanSource();
-    printTokens(scanner->tokens);
     parser->makeAST();
 
+    /*
+    printTokens(scanner->tokens);
     parser->rootNode->print();
     symbolTable_.printSymbols();
     semanticAnalyzer.printSwitch = true;
+     */
 
     semanticAnalyzer.beginAnalysis();
 
     Interpreter interpreter(parser->rootNode, symbolTable_);
-    //interpreter.interpret();
+    interpreter.interpret();
 
+    std::cout << std::endl;
     std::cout << "Print final symbols...\n";
     symbolTable_.printSymbols();
     return 0;

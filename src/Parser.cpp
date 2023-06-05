@@ -240,6 +240,7 @@ ASTExpression *Parser::parsePrimary(TokenIterator &it) {
 }
 
 ASTIf* Parser::makeIf(TokenIterator &it) {
+    // TODO: add logic for elses
     auto conditional = new ASTIf();
     conditional->addCondition(makeExpression(it));
     match(it, TokenType::KEYWORD);

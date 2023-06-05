@@ -11,6 +11,7 @@ public:
                                                                                symbolTable_(symbolTable) {};
 
     void interpret();
+
 private:
     std::unique_ptr<ASTRoot> &astRoot_;
     SymbolTable &symbolTable_;
@@ -26,5 +27,6 @@ private:
     T interpretExpression(ASTExpression *expression);
 
     void interpretPrint(ASTPrint *print);
-    void interpretRead(ASTRead * read);
+    void interpretRead(ASTRead *read);
+    void interpretIf(ASTIf *conditional);
 };

@@ -3,16 +3,22 @@
 
 void SemanticAnalyzer::beginAnalysis() {
     for (auto s: astRoot_->statementList_) {
-        if (s->declaration_) {
-            checkDeclaration(s->declaration_);
-        } else if (s->assignment_) {
-            checkAssignment(s->assignment_);
-        } else if (s->print_) {
-            checkPrint(s->print_);
-        } else if (s->read_) {
-            checkRead(s->read_);
-        }
     }
+}
+
+void SemanticAnalyzer::checkStatement(ASTStatement* statement) {
+    if (statement->declaration_) {
+        checkDeclaration(statement->declaration_);
+    } else if (statement->assignment_) {
+        checkAssignment(statement->assignment_);
+    } else if (statement->print_) {
+        checkPrint(statement->print_);
+    } else if (statement->read_) {
+        checkRead(statement->read_);
+    } else if (statement->if_) {
+        checkIf(statement->if_);
+    }
+
 }
 
 void SemanticAnalyzer::checkDeclaration(ASTDeclaration *declaration) {
@@ -105,6 +111,22 @@ SymbolType SemanticAnalyzer::checkExpression(ASTExpression *expression) {
                 return lType == rType ? SymbolType::BOOL : SymbolType::UNDEFINED;
         }
     }
+}
+
+void SemanticAnalyzer::checkIf(ASTIf* conditional) {
+    auto type = checkExpression(conditional->condition_);
+    if (type != SymbolType::BOOL) {
+        // TODO: Error handling
+        std::cerr << "If statement condition must evaluate to bool\n";
+        std::abort();
+    }
+    for (auto s : conditional->statementList_) {
+        checkStatement(s);
+    }
+
+    //TODO: else checking
+
+
 }
 
 std::string SemanticAnalyzer::typePrinter(SymbolType type) {

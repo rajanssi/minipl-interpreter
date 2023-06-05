@@ -34,3 +34,5 @@
 
 4.6 - Worked on boolean expression evaluation and if statements - 5h
 
+5.6 - Worked on conditional logic - 1h
+

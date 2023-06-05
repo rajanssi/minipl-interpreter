@@ -17,17 +17,15 @@ private:
     std::unique_ptr<ASTRoot> &astRoot_;
     SymbolTable &symbolTable_;
 
+    void checkStatement(ASTStatement* statement);
     void checkDeclaration(ASTDeclaration *declaration);
-
     void checkAssignment(ASTAssignment *assignment);
-
     SymbolType checkExpression(ASTExpression *expression);
+    void checkIf(ASTIf *conditional);
+    void checkPrint(ASTPrint *print);
+    void checkRead(ASTRead *read);
 
     std::string typePrinter(SymbolType type);
-
-    void checkPrint(ASTPrint *print);
-
-    void checkRead(ASTRead *read);
 };
 
 

@@ -121,11 +121,14 @@ struct ASTPrint {
 
 struct ASTIf {
     void addCondition(ASTExpression* newCondition);
-    void addStatement(ASTStatement* newStatement);
+    void addStatement(ASTStatement* newStatement, bool branch = false);
+
     void print(int indent = 0);
 
+    bool else_ = false;
     ASTExpression* condition_ = nullptr;
     std::vector<ASTStatement*> statementList_;
+    std::vector<ASTStatement*> elseStatementList_;
 };
 
 struct ASTLoop {

@@ -180,7 +180,7 @@ void Scanner::scanString() {
     }
 
     addToken(TokenType::STRING,
-             sourceString_.substr(tokenStart_, currentPosition_ - tokenStart_));
+             sourceString_.substr(tokenStart_+1, currentPosition_ - 2 - tokenStart_));
 }
 
 const void Scanner::fillIdCharacterTable() {

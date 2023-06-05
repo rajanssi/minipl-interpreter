@@ -33,6 +33,8 @@ void Interpreter::interpretStatement(ASTStatement *statement) {
         interpretPrint(statement->print_);
     } else if (statement->read_) {
         interpretRead(statement->read_);
+    } else if (statement->if_) {
+        interpretIf(statement->if_);
     }
 
 }
@@ -253,6 +255,15 @@ void Interpreter::interpretRead(ASTRead *read) {
             }
             symbolTable_.setSymbolValue(read->varIdent_, value);
             return;
+        }
+    }
+}
+
+void Interpreter::interpretIf(ASTIf *conditional) {
+    // TODO: add else branching
+    if (interpretExpression<bool>(conditional->condition_)) {
+        for (auto s : conditional->statementList_) {
+            interpretStatement(s);
         }
     }
 }

@@ -135,8 +135,12 @@ void ASTIf::addCondition(ASTExpression *newCondition) {
     condition_ = newCondition;
 }
 
-void ASTIf::addStatement(ASTStatement *newStatement) {
-    statementList_.push_back(newStatement);
+void ASTIf::addStatement(ASTStatement *newStatement, bool branch) {
+    if (branch)
+        elseStatementList_.push_back(newStatement);
+    else
+        statementList_.push_back(newStatement);
+
 }
 
 void ASTIf::print(int indent) {
