@@ -24,6 +24,7 @@ private:
     void checkIf(ASTIf *conditional);
     void checkPrint(ASTPrint *print);
     void checkRead(ASTRead *read);
+    void checkLoop(ASTLoop* loop);
 
     std::string typePrinter(SymbolType type);
 };

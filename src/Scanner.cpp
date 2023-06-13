@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <iterator>
+#include <regex>
 
 void Scanner::scanSource() {
     while (currentPosition_ <= sourceString_.length()) {
@@ -12,7 +13,6 @@ void Scanner::scanSource() {
 }
 
 const char Scanner::getNextChar() {
-    // TODO: PUT SOME SANE BOUNDS CHECKING HERE
     if (currentPosition_ + 1 > sourceString_.length()) {
         currentPosition_++;
         return '?';
@@ -21,7 +21,6 @@ const char Scanner::getNextChar() {
 }
 
 const char Scanner::peek() {
-    // TODO: Add some error checking code
     return sourceString_[currentPosition_];
 }
 
@@ -123,7 +122,6 @@ void Scanner::scanToken() {
             line_++;
             break;
         default:
-            //addToken(TokenType::UNKNOWN, sourceString_.substr(currentPosition_ - 1, 1));
             break;
     }
 }
@@ -179,8 +177,11 @@ void Scanner::scanString() {
         }
     }
 
-    addToken(TokenType::STRING,
-             sourceString_.substr(tokenStart_+1, currentPosition_ - 2 - tokenStart_));
+    auto newString = sourceString_.substr(tokenStart_ + 1, currentPosition_ - 2 - tokenStart_);
+    newString = std::regex_replace(newString, std::regex("\\\\n"), "\n");
+
+
+    addToken(TokenType::STRING,newString);
 }
 
 const void Scanner::fillIdCharacterTable() {
@@ -209,9 +210,6 @@ const void Scanner::fillKeywordTable() {
     keywords_.insert("if");
     keywords_.insert("else");
 }
-
-void Scanner::printSourceString() { std::cout << sourceString_ << '\n'; }
-
 void Scanner::readSourceFile(const std::string &fileName) {
     std::ifstream file(fileName);
 

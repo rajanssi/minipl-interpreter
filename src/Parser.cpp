@@ -25,9 +25,8 @@ ASTStatement *Parser::makeStatement(TokenIterator &it) {
             nextToken(it);
             statement->addPrint(makePrint(it));
         } else if (it->terminal == "for") {
-            while (it->kind != END_LINE)
-                nextToken(it);
-            return statement;
+            nextToken(it);
+            statement->addLoop(makeLoop(it));
         } else if (it->terminal == "if") {
             nextToken(it);
             statement->addIf(makeIf(it));
@@ -37,10 +36,8 @@ ASTStatement *Parser::makeStatement(TokenIterator &it) {
         statement->addAssignment(makeAssignment(it));
         return statement;
     } else {
-        // TODO: Shouldn't go here, so error handling
-        while (it->kind != END_LINE)
-            nextToken(it);
-        return statement;
+        std::cerr << "Parsing error: Incorrectly formatted expression\n";
+        std::abort();
     }
 
     return statement;
@@ -66,8 +63,7 @@ ASTDeclaration *Parser::makeDeclaration(TokenIterator &it) {
     } else if (type == "bool") {
         symbolTable_.addSymbol(identifier, new Symbol{SymbolType::BOOL, identifier, false});
     } else {
-        // TODO: sane error handling here
-        std::cerr << "Incorrect symbol type :" << type << '\n';
+        std::cerr << "Parsing error: Incorrect symbol type :" << type << '\n';
         std::abort();
     }
 
@@ -234,19 +230,27 @@ ASTExpression *Parser::parsePrimary(TokenIterator &it) {
         unary->left = leftOpnd;
         return unary;
     }
-    // TODO: Sane error checking
     std::cerr << "Parsing error: Unexpected token, terminating\n";
     std::abort();
 }
 
 ASTIf* Parser::makeIf(TokenIterator &it) {
-    // TODO: add logic for elses
     auto conditional = new ASTIf();
     conditional->addCondition(makeExpression(it));
     match(it, TokenType::KEYWORD);
     nextToken(it);
     while (it->terminal != "end") {
         conditional->addStatement(makeStatement(it));
+        match(it, TokenType::END_LINE);
+        nextToken(it);
+        if (it->terminal == "else") {
+            conditional->else_ = true;
+            nextToken(it);
+            break;
+        }
+    }
+    while (conditional->else_ && it->terminal != "end") {
+        conditional->addElseStatement(makeStatement(it));
         match(it, TokenType::END_LINE);
         nextToken(it);
     }
@@ -258,12 +262,39 @@ ASTIf* Parser::makeIf(TokenIterator &it) {
     return conditional;
 }
 
+ASTLoop* Parser::makeLoop(TokenIterator &it) {
+    auto loop = new ASTLoop();
+    match(it, TokenType::IDENTIFIER);
+    loop->ctrlVarId_ = it->terminal;
+    symbolTable_.getSymbol(it->terminal);
+    nextToken(it);
+    match(it, TokenType::KEYWORD);
+    nextToken(it);
+    loop->beginningExpr_ = makeExpression(it);
+    match(it, TokenType::DOTDOT);
+    nextToken(it);
+    loop->endingExpr_ = makeExpression(it);
+    match(it, TokenType::KEYWORD);
+    nextToken(it);
+
+    while (!(it->kind == TokenType::KEYWORD && it->terminal == "end")) {
+        loop->addStatement(makeStatement(it));
+        nextToken(it);
+    }
+    match(it, TokenType::KEYWORD);
+    nextToken(it);
+    match(it, TokenType::KEYWORD);
+    nextToken(it);
+    match(it, TokenType::END_LINE);
+
+    return loop;
+}
+
 bool Parser::match(TokenIterator &it, TokenType type) {
     if (it->kind == type) {
         return true;
     }
 
-    // TODO: Some sane error handling here
     std::cerr << "Parser error on line " << it->line << '\n';
     std::cerr << "Expected " << tokenStrings[type] << " and got " << tokenStrings[it->kind] << "\n";
     std::abort();

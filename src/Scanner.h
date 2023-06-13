@@ -73,12 +73,6 @@ public:
         }
     }
 
-    // NOTE: temporary helpers
-    void printChar(const char printable);
-
-    void printSourceString();
-
-    // NOTE: Should perhaps be driven by the parser?
     void scanSource();
 
 private:
@@ -103,8 +97,6 @@ private:
     void scanIdentifier(char starter);
 
     void addToken(TokenType kind, const std::string &value);
-
-    // constexpr int charType(const char character);
 
     const char getNextChar();
 

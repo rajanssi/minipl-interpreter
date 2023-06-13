@@ -3,10 +3,11 @@
 
 void SemanticAnalyzer::beginAnalysis() {
     for (auto s: astRoot_->statementList_) {
+        checkStatement(s);
     }
 }
 
-void SemanticAnalyzer::checkStatement(ASTStatement* statement) {
+void SemanticAnalyzer::checkStatement(ASTStatement *statement) {
     if (statement->declaration_) {
         checkDeclaration(statement->declaration_);
     } else if (statement->assignment_) {
@@ -39,7 +40,6 @@ void SemanticAnalyzer::checkAssignment(ASTAssignment *assignment) {
     auto type = symbolTable_.getSymbol(id).getType();
 
     if (!assignment->expression_) {
-        // TODO: Some sane error handling here
         std::cerr << "Assignment must have expression\n";
         std::abort();
     }
@@ -52,7 +52,6 @@ void SemanticAnalyzer::checkAssignment(ASTAssignment *assignment) {
     }
 
     if (exprType != type) {
-        // TODO: Some sane error handling here
         std::cerr << "Semantic error: Cannot assign " << typePrinter(exprType) << " to variable " << id << " of type "
                   << typePrinter(type) << '\n';
         std::abort();
@@ -113,19 +112,30 @@ SymbolType SemanticAnalyzer::checkExpression(ASTExpression *expression) {
     }
 }
 
-void SemanticAnalyzer::checkIf(ASTIf* conditional) {
+void SemanticAnalyzer::checkIf(ASTIf *conditional) {
     auto type = checkExpression(conditional->condition_);
     if (type != SymbolType::BOOL) {
-        // TODO: Error handling
         std::cerr << "If statement condition must evaluate to bool\n";
         std::abort();
     }
-    for (auto s : conditional->statementList_) {
+    for (auto s: conditional->statementList_) {
         checkStatement(s);
     }
+}
 
-    //TODO: else checking
+void SemanticAnalyzer::checkLoop(ASTLoop* loop) {
+    if (symbolTable_.getSymbol(loop->ctrlVarId_).getType() != SymbolType::INT) {
+        std::cerr << "For loop control variable must be type int\n";
+        std::abort();
+    }
+    if ((checkExpression(loop->beginningExpr_) != SymbolType::INT) || checkExpression(loop->endingExpr_) != SymbolType::INT) {
+        std::cerr << "For loop beginning and ending expressions must be type int\n";
+        std::abort();
+    }
 
+    for (auto s : loop->statementList_) {
+        checkStatement(s);
+    }
 
 }
 

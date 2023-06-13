@@ -32,6 +32,8 @@ void ASTStatement::print(int indent) {
         print_->print(indent + 2);
     } else if (if_) {
         if_->print(indent + 2);
+    } else if (loop_) {
+        loop_->print(indent + 2);
     }
 }
 
@@ -53,6 +55,10 @@ void ASTStatement::addPrint(ASTPrint *newPrint) {
 
 void ASTStatement::addIf(ASTIf *newIf) {
     if_ = newIf;
+}
+
+void ASTStatement::addLoop(ASTLoop *newLoop) {
+    loop_ = newLoop;
 }
 
 void ASTDeclaration::print(int indent) {
@@ -135,12 +141,12 @@ void ASTIf::addCondition(ASTExpression *newCondition) {
     condition_ = newCondition;
 }
 
-void ASTIf::addStatement(ASTStatement *newStatement, bool branch) {
-    if (branch)
-        elseStatementList_.push_back(newStatement);
-    else
-        statementList_.push_back(newStatement);
+void ASTIf::addStatement(ASTStatement *newStatement) {
+    statementList_.push_back(newStatement);
+}
 
+void ASTIf::addElseStatement(ASTStatement *newStatement) {
+    elseStatementList_.push_back(newStatement);
 }
 
 void ASTIf::print(int indent) {
@@ -150,13 +156,25 @@ void ASTIf::print(int indent) {
         condition_->print(indent + 2);
     }
     std::cout << '\n';
-    for (auto& s : statementList_) {
+    for (auto &s: statementList_) {
         s->print(indent + 2);
     }
 }
 
 void ASTLoop::print(int indent) {
+    std::string indentStr(indent, ' ');
+    std::cout << indentStr << "Loop: \n";
+    beginningExpr_->print(indent + 2);
+    endingExpr_->print(indent + 2);
+    std::cout << '\n';
+    for (auto s: statementList_) {
+        s->print(indent + 4);
+    }
 
+}
+
+void ASTLoop::addStatement(ASTStatement *newStatement) {
+    statementList_.push_back(newStatement);
 }
 
 int ASTLoop::increment() {

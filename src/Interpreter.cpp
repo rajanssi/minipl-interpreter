@@ -24,8 +24,7 @@ void Interpreter::interpretStatement(ASTStatement *statement) {
                 interpretAssignment<bool>(statement->assignment_);
                 return;
             case SymbolType::UNDEFINED:
-                // TODO: Error handling
-                std::cerr << "Cannot interpret undefined symbol\n";
+                std::cerr << "ERROR: Cannot interpret undefined symbol\n";
                 std::abort();
         }
 
@@ -35,6 +34,8 @@ void Interpreter::interpretStatement(ASTStatement *statement) {
         interpretRead(statement->read_);
     } else if (statement->if_) {
         interpretIf(statement->if_);
+    } else if (statement->loop_) {
+        interpretLoop(statement->loop_);
     }
 
 }
@@ -98,8 +99,8 @@ int Interpreter::interpretExpression(ASTExpression *expression) {
             return symbolTable_.getSymbol(expression->value).getIntValue();
     }
 
-    // TODO: error handling if it gets here
-    return 0xdeadbeef;
+    std::cerr << "ERROR: couldn't interpret integer expression\n";
+    std::abort();
 }
 
 template<>
@@ -118,7 +119,7 @@ std::string Interpreter::interpretExpression(ASTExpression *expression) {
             break;
         }
     }
-    std::cerr << "Error interpreting string\n";
+    std::cerr << "ERROR: couldn't interpret string expression\n";
     std::abort();
 }
 
@@ -190,7 +191,6 @@ void Interpreter::interpretPrint(ASTPrint *print) {
         case ASTExpression::Type::BOOL: {
             std::cerr << "ERROR: Printing boolean value not allowed\n";
             std::abort();
-            break;
         }
         case ASTExpression::Type::STRING: {
             auto output = interpretExpression<std::string>(print->expression_);
@@ -210,11 +210,9 @@ void Interpreter::interpretPrint(ASTPrint *print) {
                 case SymbolType::BOOL:
                     std::cerr << "ERROR: Printing boolean value not allowed\n";
                     std::abort();
-                    break;
                 case SymbolType::UNDEFINED:
                     std::cerr << "ERROR: Undefined value for identifier " << id << '\n';
                     std::abort();
-                    break;
             }
         }
     }
@@ -225,10 +223,8 @@ void Interpreter::interpretRead(ASTRead *read) {
     switch (type) {
         case SymbolType::INT: {
             int value;
-            try {
-                std::cin >> value;
-            } catch (std::runtime_error e) {
-                std::cerr << e.what() << '\n';
+            if (!(std::cin >> value)) {
+                std::cerr << "ERROR: Invalid integer input\n";
                 std::abort();
             }
             symbolTable_.setSymbolValue(read->varIdent_, value);
@@ -236,34 +232,42 @@ void Interpreter::interpretRead(ASTRead *read) {
         }
         case SymbolType::STRING: {
             std::string value;
-            try {
-                std::cin >> value;
-            } catch (std::runtime_error e) {
-                std::cerr << e.what() << '\n';
+            if (!(std::cin >> value)) {
+                std::cerr << "ERROR: Invalid string input\n";
                 std::abort();
             }
             symbolTable_.setSymbolValue(read->varIdent_, value);
             return;
         }
         case SymbolType::BOOL: {
-            bool value;
-            try {
-                std::cin >> value;
-            } catch (std::runtime_error e) {
-                std::cerr << e.what() << '\n';
-                std::abort();
-            }
-            symbolTable_.setSymbolValue(read->varIdent_, value);
-            return;
+            std::cerr << "ERROR: Can't read in booleans\n";
+            std::abort();
         }
     }
 }
 
 void Interpreter::interpretIf(ASTIf *conditional) {
-    // TODO: add else branching
     if (interpretExpression<bool>(conditional->condition_)) {
         for (auto s : conditional->statementList_) {
             interpretStatement(s);
         }
+    } else if (conditional->else_) {
+        for (auto s : conditional->elseStatementList_) {
+            interpretStatement(s);
+        }
+
+    }
+}
+
+void Interpreter::interpretLoop(ASTLoop* loop) {
+    int current = interpretExpression<int>(loop->beginningExpr_);
+    int end = interpretExpression<int>(loop->endingExpr_);
+    symbolTable_.setSymbolValue(loop->ctrlVarId_, current);
+    while (current <= end) {
+        for (auto s : loop->statementList_) {
+            interpretStatement(s);
+        }
+        current = symbolTable_.getSymbol(loop->ctrlVarId_).getIntValue() + 1;
+        symbolTable_.setSymbolValue(loop->ctrlVarId_, current);
     }
 }

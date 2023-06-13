@@ -29,4 +29,5 @@ private:
     void interpretPrint(ASTPrint *print);
     void interpretRead(ASTRead *read);
     void interpretIf(ASTIf *conditional);
+    void interpretLoop(ASTLoop *loop);
 };

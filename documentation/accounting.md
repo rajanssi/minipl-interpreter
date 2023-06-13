@@ -36,3 +36,4 @@
 
 5.6 - Worked on conditional logic - 1h
 
+6-13.6 - Final touches, documentation -10h

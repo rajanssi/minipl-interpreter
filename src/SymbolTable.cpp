@@ -62,7 +62,6 @@ void SymbolTable::printSymbols() {
 
 void SymbolTable::addSymbol(std::string &id, Symbol *symbol) {
     if (symbolTable_.find(id) != symbolTable_.end()) {
-        // TODO: some sane error handling here
         std::cerr << "Variable " << id << " already declared";
         std::abort();
     }
@@ -83,7 +82,6 @@ void SymbolTable::setSymbolValue(std::string &id, bool value) {
 
 Symbol &SymbolTable::getSymbol(std::string id) {
     if (symbolTable_.find(id) == symbolTable_.end()) {
-        // TODO: Some sane error handling here
         std::cerr << "Symbol " << id << " has not been declared";
         std::abort();
     }
